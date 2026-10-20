@@ -37,10 +37,13 @@ PRODUCTS = {
 MAX_QTY = 1000
 
 # TEST ACCOUNTS: change these passwords before the site goes live.
-SEED_PASSWORD = "1234"
-SEED_ACCOUNTS = (
-    [(f"staff{i}", "staff", f"Staff {i}") for i in range(1, 5)] +
-    [(f"driver{i}", "driver", f"Driver {i}") for i in range(1, 9)]
+SEED_PASSWORD = os.getenv("SEED_PASSWORD", "")
+def seed_accounts():
+    """Create the staff and driver test accounts if they don't exist yet."""
+    if not SEED_PASSWORD:
+        return
+    with sqlite3.connect(DATABASE_PATH) as db:
+    
 )
 
 
