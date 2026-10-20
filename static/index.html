@@ -1,0 +1,1037 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AquaFlow | Water that flows to your door</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --teal: #1fa6c4;
+    --teal-dark: #13849e;
+    --aqua: #7fd8e6;
+    --ink: #0f2a33;
+    --muted: #5d7780;
+    --bg: #f3fbfd;   
+    --card: #ffffff;
+    --line: #d7eef3;
+    --accent: #f5c542;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+/* Yeh humlog decide kar rahe hain konsi font style choose karni hain-->*/
+    font-family: 'Outfit', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;  
+    color: var(--ink);
+    background: var(--bg);
+    line-height: 1.6;
+     overflow-x: hidden;    /*unwanted scrolling avoid karta hain */
+  }
+  
+  a { color: inherit; text-decoration: none; }
+/* images aur svgs banane main kaam ata hain */
+  img, svg { max-width: 100%; }
+
+  /* ---------- Top bar ---------- */
+  .topbar {
+  /* sticky function topbar ko fixed rakta hain aur use upar dusre content ane deta hain */
+    position: sticky; top: 0; z-index: 50;
+    /* flex use kiya jata hai taki joh bhi contents hain woh sab barobar spaced rahe    */
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 6vw;
+    background: rgba(243, 251, 253, 0.85);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--line);
+  }
+  .logo { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 1.15rem; }
+  .logo-mark {
+    width: 34px; height: 34px; border-radius: 10px;
+    background: linear-gradient(135deg, var(--teal), var(--aqua));
+    display: grid; place-items: center; color: #fff; font-weight: 600; font-size: .8rem;
+  }
+  .nav-links { display: flex; gap: 26px; font-size: .95rem; color: var(--muted); } 
+  .nav-links a:hover { color: var(--teal-dark); }
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 12px 22px; border-radius: 999px; border: none; cursor: pointer;
+    font: inherit; font-weight: 500; font-size: .95rem;
+    background: var(--teal); color: #fff;
+    transition: transform .2s ease, background .2s ease, box-shadow .2s ease;
+    box-shadow: 0 8px 20px rgba(31, 166, 196, .25);
+  }
+  .btn:hover { background: var(--teal-dark); transform: translateY(-2px); }
+  .btn.ghost {
+    background: transparent; color: var(--teal-dark);
+    box-shadow: none; border: 1.5px solid var(--teal);
+  }
+  .btn.ghost:hover { background: rgba(31, 166, 196, .08); }
+  .btn.small { padding: 9px 18px; font-size: .88rem; }
+  .top-actions { display: flex; align-items: center; gap: 10px; }
+
+  /* ---------- Login panel ---------- */
+  .login-panel {
+    position: absolute; top: calc(100% + 8px); right: 6vw; width: 290px; z-index: 60;
+    background: #fff; border: 1px solid var(--line); border-radius: 20px; padding: 20px;
+    box-shadow: 0 22px 50px rgba(15, 42, 51, .14);
+    opacity: 0; transform: translateY(-12px); pointer-events: none;
+    transition: opacity .25s ease, transform .25s ease;
+  }
+  .login-panel.open { opacity: 1; transform: none; pointer-events: auto; }
+  .login-panel p { font-size: .85rem; color: var(--muted); margin-bottom: 12px; }
+  .login-role {
+    display: block; width: 100%; text-align: left; padding: 12px 14px; margin-bottom: 8px;
+    border-radius: 12px; border: 1px solid var(--line); background: var(--bg);
+    font: inherit; font-size: .95rem; color: var(--ink); cursor: pointer; transition: background .2s ease;
+  }
+  .login-role:hover { background: rgba(31, 166, 196, .1); }
+  .login-role[hidden] { display: none; }
+  .login-form { display: grid; gap: 12px; }
+  .login-form h4 { font-weight: 500; font-size: 1.05rem; }
+  .login-form .back { justify-self: start; background: none; border: none; color: var(--teal-dark); cursor: pointer; font: inherit; font-size: .9rem; padding: 0; }
+  .login-form .btn { justify-content: center; }
+  .login-msg { font-size: .85rem; color: var(--teal-dark); min-height: 1em; }
+
+  /* ---------- Sections ---------- */
+  section { padding: 110px 6vw; }
+  .eyebrow {
+    display: inline-block; font-size: .78rem; letter-spacing: .14em;
+    text-transform: uppercase; color: var(--teal-dark); margin-bottom: 14px;
+  }
+  h1 { font-size: clamp(2.8rem, 6vw, 4.6rem); font-weight: 300; line-height: 1.05; letter-spacing: -.02em; }
+  h2 { font-size: clamp(2rem, 4vw, 3rem); font-weight: 300; line-height: 1.12; letter-spacing: -.01em; }
+  h1 strong, h2 strong { font-weight: 500; color: var(--teal); }
+  .lead { color: var(--muted); font-size: 1.08rem; max-width: 520px; margin-top: 18px; }
+  .center { text-align: center; }
+  .center .lead { margin-left: auto; margin-right: auto; }
+
+  /* ---------- Hero ---------- */
+  .hero {
+    display: grid; grid-template-columns: 1.1fr .9fr; align-items: center; gap: 40px;
+    min-height: calc(100vh - 70px);
+    background:
+      radial-gradient(circle at 80% 30%, rgba(127, 216, 230, .45), transparent 55%),
+      linear-gradient(180deg, #ffffff, var(--bg));
+  }
+  .hero-actions { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 34px; }
+  .hero-note { margin-top: 26px; font-size: .85rem; color: var(--muted); }
+  .bottle-wrap { position: relative; display: grid; place-items: center; }
+  .bottle-wrap::before {
+    content: ""; position: absolute; width: 70%; aspect-ratio: 1;
+    border-radius: 50%; background: radial-gradient(circle, var(--aqua), transparent 70%); opacity: .5;
+  }
+  .bottle {
+    position: relative; width: 210px; height: 400px; margin: 0 auto;
+    filter: drop-shadow(0 30px 40px rgba(19, 132, 158, .25));
+    animation: bob 7s ease-in-out infinite;
+  }
+  @keyframes bob { 50% { transform: translateY(-14px); } }
+  .bottle .cap {
+    position: absolute; top: 0; left: 50%; width: 80px; height: 46px; transform: translateX(-50%);
+    border-radius: 10px 10px 6px 6px;
+    background: linear-gradient(90deg, #0f7a95, #3fc7e0 35%, #b6f1ff 50%, #3fc7e0 65%, #0f7a95);
+    box-shadow: inset -6px 0 10px rgba(0,40,60,.4), 0 10px 18px rgba(0,0,0,.25);
+  }
+  .bottle .neck {
+    position: absolute; top: 40px; left: 50%; width: 72px; height: 42px; transform: translateX(-50%);
+    background: linear-gradient(90deg, rgba(120,200,220,.45), rgba(255,255,255,.7) 40%, rgba(120,200,220,.5));
+    border-radius: 8px 8px 0 0;
+    border: 1px solid rgba(255,255,255,.7);
+  }
+  .bottle .body {
+    position: absolute; top: 78px; left: 0; right: 0; bottom: 0; border-radius: 34px 34px 46px 46px;
+    background:
+      linear-gradient(90deg, rgba(20,110,140,.55) 0%, rgba(120,210,230,.2) 18%, rgba(255,255,255,.75) 30%, rgba(255,255,255,.05) 45%, rgba(120,210,230,.15) 70%, rgba(20,110,140,.6) 100%);
+    border: 2px solid rgba(255,255,255,.65);
+    box-shadow:
+      inset 0 0 40px rgba(127,216,230,.45),
+      inset 0 -30px 40px rgba(28,143,174,.35);
+    overflow: hidden;
+  }
+  .bottle .water {
+    position: absolute; left: 0; right: 0; bottom: 0; height: 74%;
+    background: linear-gradient(180deg, rgba(127,216,230,.35), rgba(28,143,174,.55));
+    border-top: 2px solid rgba(255,255,255,.75);
+  }
+  .bottle .water::after {
+    content: ""; position: absolute; top: -10px; left: -10%; width: 120%; height: 20px; border-radius: 50%;
+    background: rgba(255,255,255,.35); filter: blur(2px);
+  }
+  .bottle .label {
+    position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%);
+    width: 140px; padding: 18px 10px; text-align: center; border-radius: 10px;
+    background: linear-gradient(180deg, #fbfaf6, #efe9dd);
+    box-shadow: 0 8px 18px rgba(0,40,50,.22), inset 0 1px 0 #fff;
+  }
+  .bottle .label b { display: block; font-size: 1.9rem; font-weight: 900; letter-spacing: -.02em; color: #1c8fae; }
+  .bottle .label small { display: block; font-size: .62rem; letter-spacing: .24em; color: #5d7780; margin-top: 2px; }
+  .bottle .highlight {
+    position: absolute; top: 90px; left: 22px; width: 14px; height: 230px; border-radius: 10px;
+    background: linear-gradient(180deg, rgba(255,255,255,.95), rgba(255,255,255,.1));
+    filter: blur(.5px);
+  }
+  .bottle .highlight.thin { left: auto; right: 26px; width: 6px; top: 110px; height: 170px; opacity: .6; }
+  .bottle .drop {
+    position: absolute; width: 10px; height: 13px; border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+    background: radial-gradient(circle at 35% 30%, #ffffff, rgba(200,240,250,.6) 40%, rgba(120,200,220,.4));
+    box-shadow: inset -2px -2px 3px rgba(0,80,100,.25), 0 2px 3px rgba(0,0,0,.12);
+    opacity: .9;
+  }
+
+  /* ---------- About ---------- */
+  .about { background: #fff; }
+  .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
+  .about p.body { color: var(--muted); margin-top: 18px; }
+  .mini-feats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 40px; }
+  .mini {
+    padding: 22px 18px; border-radius: 18px; background: var(--bg); border: 1px solid var(--line);
+    text-align: center;
+  }
+  .dot {
+    width: 52px; height: 52px; margin: 0 auto 12px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--aqua), #b9eef7);
+    box-shadow: 0 8px 18px rgba(31,166,196,.25), inset 0 2px 0 rgba(255,255,255,.7);
+    display: grid; place-items: center; color: var(--teal-dark);
+  }
+  .dot svg { width: 26px; height: 26px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+  .dot img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+  .mini h4 { font-weight: 500; font-size: .98rem; }
+  .mini span { font-size: .82rem; color: var(--muted); }
+
+  /* ---------- Why ---------- */
+  .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; margin-top: 60px; }
+  .card {
+    background: var(--card); border-radius: 22px; padding: 32px 28px;
+    border: 1px solid var(--line);
+    transition: transform .3s ease, box-shadow .3s ease;
+  }
+  .card:hover { transform: translateY(-6px); box-shadow: 0 22px 40px rgba(15, 42, 51, .08); }
+  .card .icon {
+    width: 46px; height: 46px; border-radius: 14px; margin-bottom: 20px;
+    background: linear-gradient(135deg, rgba(31,166,196,.18), rgba(127,216,230,.35));
+    display: grid; place-items: center; color: var(--teal-dark); font-weight: 600;
+  }
+  .card h3 { font-weight: 500; font-size: 1.15rem; margin-bottom: 8px; }
+  .card p { color: var(--muted); font-size: .95rem; }
+
+  /* ---------- Steps ---------- */
+  .steps { background: linear-gradient(180deg, var(--bg), #e9f8fb); }
+  .step-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; margin-top: 64px; position: relative; }
+  .step { text-align: center; padding: 10px; }
+  .step-num {
+    width: 64px; height: 64px; margin: 0 auto 22px; border-radius: 50%;
+    background: var(--teal); color: #fff; font-size: 1.3rem; font-weight: 500;
+    display: grid; place-items: center; box-shadow: 0 10px 24px rgba(31,166,196,.35);
+  }
+  .step h3 { font-weight: 500; font-size: 1.2rem; margin-bottom: 8px; }
+  .step p { color: var(--muted); font-size: .95rem; max-width: 280px; margin: 0 auto; }
+
+  /* ---------- Pricing ---------- */
+  .pricing { background: #fff; }
+  .price-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 60px; align-items: stretch; }
+  .price {
+    position: relative; background: var(--bg); border: 1px solid var(--line);
+    border-radius: 24px; padding: 40px 30px; text-align: center;
+    transition: transform .3s ease;
+  }
+  .price:hover { transform: translateY(-6px); }
+  .price.featured {
+    background: linear-gradient(160deg, var(--teal), var(--teal-dark));
+    color: #fff; border: none; transform: translateY(-10px);
+    box-shadow: 0 30px 50px rgba(19, 132, 158, .3);
+  }
+  .price.featured:hover { transform: translateY(-16px); }
+  .badge {
+    position: absolute; top: -13px; left: 50%; transform: translateX(-50%);
+    background: var(--accent); color: var(--ink); font-size: .75rem; font-weight: 600;
+    padding: 6px 14px; border-radius: 999px; white-space: nowrap;
+  }
+  .price .size { font-size: .9rem; opacity: .8; }
+  .price .name { font-weight: 500; font-size: 1.25rem; margin: 6px 0 14px; }
+  .price .amount { font-size: 2.6rem; font-weight: 300; }
+  .price .amount small { font-size: 1rem; opacity: .7; }
+  .price ul { list-style: none; margin: 22px 0 28px; font-size: .92rem; color: var(--muted); }
+  .price.featured ul { color: rgba(255,255,255,.85); }
+  .price li { padding: 6px 0; }
+  .price .btn { width: 100%; justify-content: center; }
+  .price.featured .btn { background: #fff; color: var(--teal-dark); box-shadow: none; }
+  .price.featured .btn:hover { background: var(--bg); }
+  .sub-head { font-weight: 400; font-size: 1.6rem; text-align: center; margin-top: 80px; }
+  .tax-note { text-align: center; color: var(--muted); font-size: .88rem; margin-top: 30px; }
+
+  /* ---------- Quote ---------- */
+  .quote-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
+  .contact-points { margin-top: 28px; display: grid; gap: 14px; color: var(--muted); font-size: .95rem; }
+  .contact-points div::before { content: "\2022"; color: var(--teal); font-size: 1.4rem; margin-right: 10px; vertical-align: middle; }
+  form.quote {
+    background: #fff; border-radius: 24px; padding: 36px; border: 1px solid var(--line);
+    box-shadow: 0 20px 50px rgba(15, 42, 51, .07);
+    display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+  }
+  .field { display: flex; flex-direction: column; gap: 6px; }
+  .field.full { grid-column: 1 / -1; }
+  .field label { font-size: .82rem; color: var(--muted); }
+  input, select, textarea {
+    font: inherit; font-size: .95rem; color: var(--ink);
+    padding: 12px 14px; border-radius: 12px; border: 1px solid var(--line);
+    background: var(--bg); outline: none; transition: border-color .2s, box-shadow .2s;
+    width: 100%;
+  }
+  input:focus, select:focus, textarea:focus { border-color: var(--teal); box-shadow: 0 0 0 4px rgba(31,166,196,.15); }
+  form.quote .btn { grid-column: 1 / -1; justify-content: center; padding: 15px; }
+  .success, .error { display: none; grid-column: 1 / -1; text-align: center; font-weight: 500; }
+  .success { color: var(--teal-dark); }
+  .error { color: #c0392b; }
+
+  /* ---------- Contact ---------- */
+  .contact { background: #fff; }
+  .contact-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 22px; margin-top: 60px; }
+  .contact-card {
+    display: block; text-align: center; padding: 34px 22px; background: var(--bg);
+    border: 1px solid var(--line); border-radius: 22px;
+    transition: transform .3s ease, box-shadow .3s ease;
+  }
+  a.contact-card:hover { transform: translateY(-6px); box-shadow: 0 22px 40px rgba(15, 42, 51, .08); }
+  .contact-card h4 { font-weight: 500; font-size: 1.05rem; margin: 14px 0 6px; }
+  .contact-card span { font-size: .9rem; color: var(--muted); overflow-wrap: anywhere; }
+  .prod-img { display: block; width: 130px; height: 130px; object-fit: contain; margin: 0 auto 14px; }
+  .card img.card-img { display: block; width: 120px; height: 120px; object-fit: contain; margin-bottom: 18px; }
+  .card-actions { display: flex; gap: 10px; margin-top: 22px; flex-wrap: wrap; }
+  .product .thumb { width: 56px; height: 56px; object-fit: contain; border-radius: 12px; background: var(--bg); flex-shrink: 0; }
+  .product { gap: 14px; }
+  .product .info { flex: 1; }
+  .cards.two { grid-template-columns: repeat(2, 1fr); }
+  .premix { background: #fff; }
+  .dot.wa { color: #25d366; }
+  .dot.gmail { color: #ea4335; }
+
+  /* ---------- CTA ---------- */
+  .cta {
+    text-align: center; padding: 120px 6vw;
+    background: radial-gradient(circle at 50% 0%, rgba(127,216,230,.5), transparent 60%), var(--bg);
+  }
+  .cta h2 { max-width: 700px; margin: 0 auto; }
+  .cta .btn { margin-top: 36px; padding: 16px 34px; font-size: 1rem; }
+  .cta .sub { color: var(--muted); margin-top: 16px; font-size: .95rem; }
+
+  /* ---------- Footer ---------- */
+  footer {
+    padding: 34px 6vw; border-top: 1px solid var(--line); background: #fff;
+    display: flex; justify-content: space-between; flex-wrap: wrap; gap: 14px;
+    color: var(--muted); font-size: .88rem;
+  }
+
+  /* ---------- Modal ---------- */
+  .overlay {
+    position: fixed; inset: 0; z-index: 100; display: none; align-items: center; justify-content: center;
+    background: rgba(15, 42, 51, .4); backdrop-filter: blur(4px); padding: 20px;
+  }
+  .overlay.open { display: flex; animation: fade .25s ease; }
+  @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+  .modal {
+    width: 100%; max-width: 520px; background: #fff; border-radius: 26px;
+    padding: 36px; position: relative; max-height: 90vh; overflow-y: auto;
+    box-shadow: 0 40px 80px rgba(0,0,0,.2); animation: rise .35s ease;
+  }
+  @keyframes rise { from { transform: translateY(20px); opacity: 0; } to { transform: none; opacity: 1; } }
+  .close {
+    position: absolute; top: 16px; right: 16px; width: 36px; height: 36px; border-radius: 50%;
+    border: none; background: var(--bg); cursor: pointer; font-size: 1.1rem; color: var(--muted);
+  }
+  .modal .step-label { font-size: .8rem; color: var(--teal-dark); letter-spacing: .08em; text-transform: uppercase; }
+  .modal h3 { font-size: 1.6rem; font-weight: 400; margin: 6px 0 22px; }
+  .modal .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .modal .stack { display: grid; gap: 14px; }
+  .modal .actions { display: flex; justify-content: flex-end; margin-top: 24px; gap: 10px; }
+  .modal .btn { justify-content: center; }
+  .modal .actions .btn.ghost { box-shadow: none; }
+  .product {
+    display: flex; align-items: center; justify-content: space-between; gap: 14px;
+    padding: 16px; border-radius: 16px; border: 1px solid var(--line); margin-bottom: 12px;
+  }
+  .product .info b { font-weight: 500; display: block; }
+  .product .info span { font-size: .85rem; color: var(--muted); }
+  .product .right { display: flex; align-items: center; gap: 12px; }
+  .qty { display: flex; align-items: center; gap: 8px; }
+  .qty button {
+    width: 30px; height: 30px; border-radius: 50%; border: 1px solid var(--line);
+    background: var(--bg); cursor: pointer; font-size: 1rem; color: var(--teal-dark);
+  }
+  .qty output { min-width: 20px; text-align: center; font-weight: 500; }
+  .callout { margin-top: 18px; padding: 16px 18px; border-radius: 16px; background: var(--bg); border: 1px solid var(--line); font-size: .9rem; color: var(--muted); }
+  .callout b { display: block; font-weight: 500; color: var(--ink); margin-bottom: 4px; }
+  .callout-actions { display: flex; gap: 10px; margin-top: 12px; flex-wrap: wrap; }
+  .total { display: flex; justify-content: space-between; margin-top: 18px; font-size: 1.05rem; }
+  .total strong { color: var(--teal-dark); font-weight: 600; }
+  .hidden { display: none !important; }
+
+  /* ---------- Reveal ---------- */
+  .reveal { opacity: 0; transform: translateY(24px); transition: opacity .8s ease, transform .8s ease; }
+  .reveal.in { opacity: 1; transform: none; }
+
+  /* ---------- Responsive ---------- */
+  @media (max-width: 900px) {
+    .nav-links { display: none; }
+    .hero, .about-grid, .quote-grid { grid-template-columns: 1fr; text-align: center; }
+    .lead { margin-left: auto; margin-right: auto; }
+    .hero-actions { justify-content: center; }
+    .bottle-wrap { order: -1; }
+    .bottle { width: 170px; height: 330px; }
+    .cards, .step-row, .price-row { grid-template-columns: 1fr; }
+    .price.featured { transform: none; }
+    .mini-feats { grid-template-columns: 1fr; }
+    .contact-grid { grid-template-columns: 1fr 1fr; }
+    .cards.two { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 560px) {
+    section { padding: 80px 6vw; }
+    form.quote, .modal .grid2, .contact-grid { grid-template-columns: 1fr; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+  }
+</style>
+<style>
+  .top-actions { display:flex; align-items:center; gap:10px; }
+  .login-panel { position:absolute; top:calc(100% + 8px); right:6vw; width:290px; z-index:60; background:#fff; border:1px solid var(--line); border-radius:20px; padding:20px; box-shadow:0 22px 50px rgba(15,42,51,.14); opacity:0; transform:translateY(-12px); pointer-events:none; transition:opacity .25s ease,transform .25s ease; }
+  .login-panel.open { opacity:1; transform:none; pointer-events:auto; }
+  .login-panel p { font-size:.85rem; color:var(--muted); margin-bottom:12px; }
+  .login-role { display:block; width:100%; text-align:left; padding:12px 14px; margin-bottom:8px; border-radius:12px; border:1px solid var(--line); background:var(--bg); font:inherit; font-size:.95rem; color:var(--ink); cursor:pointer; }
+  .login-role:hover { background:rgba(31,166,196,.1); }
+  .login-form { display:grid; gap:12px; }
+  .login-form h4 { font-weight:500; font-size:1.05rem; }
+  .login-form .back { justify-self:start; background:none; border:none; color:var(--teal-dark); cursor:pointer; font:inherit; font-size:.9rem; padding:0; }
+  .login-form .btn { justify-content:center; }
+  .login-msg { font-size:.85rem; color:#c0392b; min-height:1em; }
+  .register-link { border:0; background:none; color:var(--teal-dark); font:inherit; font-size:.82rem; cursor:pointer; padding:2px 0; text-align:left; }
+  .register-link:hover { text-decoration:underline; }
+  .register-form { display:grid; gap:11px; }
+  .register-form h4 { font-weight:500; font-size:1.05rem; }
+  .register-form .btn { justify-content:center; }
+  .hidden { display:none !important; }
+  @media (max-width:560px) { .top-actions { gap:6px; } .login-panel { right:4vw; width:min(290px,92vw); } }
+</style>
+</head>
+<body>
+
+<!-- Top bar -->
+<header class="topbar">
+  <a href="#top" class="logo">
+    <span class="logo-mark">AF</span>
+    AquaFlow
+  </a>
+  <nav class="nav-links">
+    <a href="#about">About us</a>
+    <a href="#why">Why us</a>
+    <a href="#how">How it works</a>
+    <a href="#pricing">Pricing</a>
+    <a href="#quote">Get a quote</a>
+    <a href="#contact">Contact us</a>
+  </nav>
+  <div class="top-actions">
+    <button class="btn small ghost" id="loginToggle" aria-expanded="false" aria-controls="loginPanel">Login</button>
+    <button class="btn small ghost" id="registerTop" type="button">New client</button>
+    <button class="btn small" data-open-order>Order now</button>
+  </div>
+  <div class="login-panel" id="loginPanel" aria-hidden="true">
+    <div id="roleChoice"><p>Sign in as</p><button type="button" class="login-role" data-role="client">Client</button><button type="button" class="login-role" data-role="staff">Staff</button><button type="button" class="login-role" data-role="driver">Driver</button><button type="button" class="register-link" id="registerOpen">New client? Create an account</button></div>
+    <form class="login-form hidden" id="loginForm"><button type="button" class="back" id="loginBack">&larr; Back</button><h4 id="loginTitle">Login</h4><div class="field"><label for="loginId">User ID</label><input id="loginId" required></div><div class="field"><label for="loginPassword">Password</label><input id="loginPassword" type="password" required></div><button class="btn small" type="submit">Log in</button><p class="login-msg" id="loginMsg"></p></form>
+    <form class="register-form hidden" id="registerForm"><button type="button" class="back" id="registerBack">&larr; Back</button><h4>Create client account</h4><div class="field"><label for="registerName">Full name</label><input id="registerName" required></div><div class="field"><label for="registerPhone">Phone</label><input id="registerPhone" type="tel" required></div><div class="field"><label for="registerEmail">Email</label><input id="registerEmail" type="email" required></div><div class="field"><label for="registerPassword">Password</label><input id="registerPassword" type="password" minlength="12" required></div><div class="field"><label for="registerConfirm">Confirm password</label><input id="registerConfirm" type="password" minlength="12" required></div><button class="btn small" type="submit">Create account</button><p class="login-msg" id="registerMsg"></p></form>
+  </div>
+</header>
+
+<!-- Hero -->
+<section class="hero" id="top">
+  <div>
+    <span class="eyebrow">Bottled water delivery</span>
+    <h1>Water <strong>that</strong><br><strong>flows</strong> to your<br>door.</h1>
+    <p class="lead">Purified drinking water for your commercial space or office, delivered on your schedule. Order in seconds, refill whenever you need.</p>
+    <div class="hero-actions">
+      <button class="btn" data-open-order>Order now</button>
+    </div>
+    <p class="hero-note">Free delivery on your first order. GST added at checkout.</p>
+  </div>
+
+  <div class="bottle-wrap">
+    <div class="bottle" role="img" aria-label="AquaFlow glass water bottle">
+      <div class="cap"></div>
+      <div class="neck"></div>
+      <div class="body">
+        <div class="water"></div>
+        <div class="highlight"></div>
+        <div class="highlight thin"></div>
+        <div class="label"><b>AF</b><small>PURIFIED WATER</small></div>
+      </div>
+      <span class="drop" style="left: 26px; top: 180px;"></span>
+      <span class="drop" style="left: 48px; top: 250px; transform: scale(.7);"></span>
+      <span class="drop" style="right: 30px; top: 210px; transform: scale(.85);"></span>
+      <span class="drop" style="right: 52px; top: 300px; transform: scale(.6);"></span>
+      <span class="drop" style="left: 70px; top: 330px; transform: scale(.75);"></span>
+      <span class="drop" style="right: 80px; top: 130px; transform: scale(.6);"></span>
+    </div>
+  </div>
+</section>
+
+<!-- About -->
+<section class="about" id="about">
+  <div class="about-grid">
+    <div class="reveal">
+      <span class="eyebrow">About us</span>
+      <h2>Clean water, <strong>supplied with care.</strong></h2>
+      <p class="body">AquaFlow supplies purified drinking water to homes, offices and shops across the city. Every bottle is filtered, sealed and checked before it leaves our facility.</p>
+      <p class="body">We keep the process simple: choose what you need, pick a time, and we bring it to your door.</p>
+    </div>
+    <div class="mini-feats reveal">
+      <div class="mini"><div class="dot"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3s-6 6.5-6 11a6 6 0 0 0 12 0c0-4.5-6-11-6-11z"/><path d="M9 14a3 3 0 0 0 3 3"/></svg></div><h4>Purified</h4><span>Multi-stage filtration</span></div>
+      <div class="mini"><div class="dot"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="1.5" width="6" height="4" rx="2"/><path d="M10.5 5.5v2.5h3V5.5"/><path d="M12 9.5c0 0-1.2 1.4-1.2 2.4a1.2 1.2 0 0 0 2.4 0c0-1-1.2-2.4-1.2-2.4z"/><path d="M7.5 14h9"/><path d="M8.5 14v3.5a3.5 3.5 0 0 0 7 0V14"/><path d="M8.5 17.5h7"/></svg></div><h4>Tested</h4><span>Checked every batch</span></div>
+      <div class="mini"><div class="dot"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 6h12v10H2z"/><path d="M14 10h4l3 3v3h-7"/><circle cx="6" cy="17.5" r="1.8"/><circle cx="17" cy="17.5" r="1.8"/></svg></div><h4>Delivered</h4><span>On time, every time</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- Why us -->
+<section id="why">
+  <div class="center reveal">
+    <span class="eyebrow">Why us</span>
+    <h2>Why families and businesses <strong>choose AquaFlow.</strong></h2>
+    <p class="lead">Reliable supply, honest pricing and a team that answers when you call.</p>
+  </div>
+  <div class="cards">
+    <div class="card reveal"><div class="icon">P</div><h3>Purified water</h3><p>Filtered through a multi-stage process and tested before every delivery.</p></div>
+    <div class="card reveal"><div class="icon">S</div><h3>Flexible schedules</h3><p>Weekly, fortnightly or on demand. Pause or change your order anytime.</p></div>
+    <div class="card reveal"><div class="icon">T</div><h3>Live tracking</h3><p>Know exactly when your driver is on the way with real-time updates.</p></div>
+    <div class="card reveal"><div class="icon">C</div><h3>Compatible containers</h3><p>Works with most standard dispensers, jars and bottle sizes.</p></div>
+    <div class="card reveal"><div class="icon">B</div><h3>Business accounts</h3><p>Bulk supply, monthly invoicing and dedicated support for offices.</p></div>
+    <div class="card reveal"><div class="icon">R</div><h3>Easy returns</h3><p>Empty bottles are collected at your next delivery. No hassle.</p></div>
+  </div>
+</section>
+
+<!-- How it works -->
+<section class="steps" id="how">
+  <div class="center reveal">
+    <span class="eyebrow">How it works</span>
+    <h2>From order to glass in <strong>three steps.</strong></h2>
+  </div>
+  <div class="step-row">
+    <div class="step reveal"><div class="step-num">1</div><h3>Place your order</h3><p>Tell us where to deliver and choose your products in under a minute.</p></div>
+    <div class="step reveal"><div class="step-num">2</div><h3>We deliver</h3><p>Our driver arrives in your chosen time slot and swaps your empties.</p></div>
+    <div class="step reveal"><div class="step-num">3</div><h3>Enjoy and refill</h3><p>Pour, sip and reorder whenever you're running low.</p></div>
+  </div>
+</section>
+
+<!-- Pricing -->
+<section class="pricing" id="pricing">
+  <div class="center reveal">
+    <span class="eyebrow">Pricing</span>
+    <h2>Simple rates. <strong>GST added at checkout.</strong></h2>
+  </div>
+  <div class="price-row">
+    <div class="price reveal">
+      <div class="size">Bottles</div>
+      <img class="prod-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMDAgMjAwIj4KICA8ZGVmcz4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0iYjEwMC1nbGFzcyIgeDE9IjAiIHgyPSIxIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjYmZlM2YwIi8+CiAgICAgIDxzdG9wIG9mZnNldD0iLjQ1IiBzdG9wLWNvbG9yPSIjZjdmY2ZlIi8+CiAgICAgIDxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iI2I1ZGNlYyIvPgogICAgPC9saW5lYXJHcmFkaWVudD4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0iYjEwMC13YXRlciIgeDE9IjAiIHgyPSIxIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjN2ZkOGU2IiBzdG9wLW9wYWNpdHk9Ii41NSIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiMxZmE2YzQiIHN0b3Atb3BhY2l0eT0iLjQ1Ii8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogIDwvZGVmcz4KICA8Y2lyY2xlIGN4PSIxMDAiIGN5PSIxMDAiIHI9IjkyIiBmaWxsPSIjZTZmOGZiIi8+CiAgPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMTAwIDEwMCkgc2NhbGUoMC43OCkgdHJhbnNsYXRlKC0xMDAgLTEwMCkiPgogICAgPHJlY3QgeD0iODQiIHk9IjE2IiB3aWR0aD0iMzIiIGhlaWdodD0iMTgiIHJ4PSIzIiBmaWxsPSIjMWU2ZmQ2Ii8+CiAgICA8cmVjdCB4PSI4NCIgeT0iMTYiIHdpZHRoPSIzMiIgaGVpZ2h0PSI1IiByeD0iMiIgZmlsbD0iIzRmOTNlNiIvPgogICAgPHJlY3QgeD0iODgiIHk9IjM0IiB3aWR0aD0iMjQiIGhlaWdodD0iMTAiIGZpbGw9IiNkOWVjZjciIHN0cm9rZT0iIzlmYzllMCIgc3Ryb2tlLXdpZHRoPSIxIi8+CiAgICA8cGF0aCBkPSJNODAgNDQgTDEyMCA0NCBRMTI5IDYwIDEyOSA3OCBMMTI5IDE4MCBRMTI5IDE4NyAxMjIgMTg3IEw3OCAxODcgUTcxIDE4NyA3MSAxODAgTDcxIDc4IFE3MSA2MCA4MCA0NCBaIiBmaWxsPSJ1cmwoI2IxMDAtZ2xhc3MpIiBzdHJva2U9IiM4Y2M0ZGQiIHN0cm9rZS13aWR0aD0iMS41Ii8+CiAgICA8cGF0aCBkPSJNNzIgODAgSDEyOCBWMTgyIFExMjggMTg2IDEyNCAxODYgSDc2IFE3MiAxODYgNzIgMTgyIFoiIGZpbGw9InVybCgjYjEwMC13YXRlcikiLz4KICAgIDxyZWN0IHg9IjgwIiB5PSI2MiIgd2lkdGg9IjUiIGhlaWdodD0iMTEyIiByeD0iMi41IiBmaWxsPSIjZmZmZmZmIiBvcGFjaXR5PSIuNyIvPgogICAgPHJlY3QgeD0iNzIiIHk9Ijk4IiB3aWR0aD0iNTYiIGhlaWdodD0iNTIiIGZpbGw9IiMxZmE2YzQiLz4KICAgIDxyZWN0IHg9IjcyIiB5PSI5OCIgd2lkdGg9IjU2IiBoZWlnaHQ9IjYiIGZpbGw9IiNmZmZmZmYiIG9wYWNpdHk9Ii44NSIvPgogICAgPHJlY3QgeD0iNzIiIHk9IjE0NCIgd2lkdGg9IjU2IiBoZWlnaHQ9IjYiIGZpbGw9IiNmZmZmZmYiIG9wYWNpdHk9Ii44NSIvPgogICAgPHRleHQgeD0iMTAwIiB5PSIxMjEiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNSIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+QUY8L3RleHQ+CiAgICA8dGV4dCB4PSIxMDAiIHk9IjEzNiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjkiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPjEwMCBtbDwvdGV4dD4KICAgIDxyZWN0IHg9Ijc0IiB5PSIxODQiIHdpZHRoPSI1MiIgaGVpZ2h0PSI0IiByeD0iMiIgZmlsbD0iIzlmYzllMCIvPgogIDwvZz4KPC9zdmc+" alt="100 ml">
+      <div class="name">100 ml</div>
+      <div class="amount">&#8377;600 <small>/ pack of 48</small></div>
+      <ul><li>Pack of 48 bottles</li><li>Minimum 25 packs</li><li>Delivered to your door</li></ul>
+      <button class="btn ghost" data-open-order>Choose plan</button>
+    </div>
+    <div class="price reveal">
+      <div class="size">Bottles</div>
+      <img class="prod-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMDAgMjAwIj4KICA8ZGVmcz4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0iYjI1MC1nbGFzcyIgeDE9IjAiIHgyPSIxIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjYmZlM2YwIi8+CiAgICAgIDxzdG9wIG9mZnNldD0iLjQ1IiBzdG9wLWNvbG9yPSIjZjdmY2ZlIi8+CiAgICAgIDxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iI2I1ZGNlYyIvPgogICAgPC9saW5lYXJHcmFkaWVudD4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0iYjI1MC13YXRlciIgeDE9IjAiIHgyPSIxIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjN2ZkOGU2IiBzdG9wLW9wYWNpdHk9Ii41NSIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiMxZmE2YzQiIHN0b3Atb3BhY2l0eT0iLjQ1Ii8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogIDwvZGVmcz4KICA8Y2lyY2xlIGN4PSIxMDAiIGN5PSIxMDAiIHI9IjkyIiBmaWxsPSIjZTZmOGZiIi8+CiAgPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMTAwIDEwMCkgc2NhbGUoMC44NikgdHJhbnNsYXRlKC0xMDAgLTEwMCkiPgogICAgPHJlY3QgeD0iODQiIHk9IjE2IiB3aWR0aD0iMzIiIGhlaWdodD0iMTgiIHJ4PSIzIiBmaWxsPSIjMWU2ZmQ2Ii8+CiAgICA8cmVjdCB4PSI4NCIgeT0iMTYiIHdpZHRoPSIzMiIgaGVpZ2h0PSI1IiByeD0iMiIgZmlsbD0iIzRmOTNlNiIvPgogICAgPHJlY3QgeD0iODgiIHk9IjM0IiB3aWR0aD0iMjQiIGhlaWdodD0iMTAiIGZpbGw9IiNkOWVjZjciIHN0cm9rZT0iIzlmYzllMCIgc3Ryb2tlLXdpZHRoPSIxIi8+CiAgICA8cGF0aCBkPSJNODAgNDQgTDEyMCA0NCBRMTI5IDYwIDEyOSA3OCBMMTI5IDE4MCBRMTI5IDE4NyAxMjIgMTg3IEw3OCAxODcgUTcxIDE4NyA3MSAxODAgTDcxIDc4IFE3MSA2MCA4MCA0NCBaIiBmaWxsPSJ1cmwoI2IyNTAtZ2xhc3MpIiBzdHJva2U9IiM4Y2M0ZGQiIHN0cm9rZS13aWR0aD0iMS41Ii8+CiAgICA8cGF0aCBkPSJNNzIgODAgSDEyOCBWMTgyIFExMjggMTg2IDEyNCAxODYgSDc2IFE3MiAxODYgNzIgMTgyIFoiIGZpbGw9InVybCgjYjI1MC13YXRlcikiLz4KICAgIDxyZWN0IHg9IjgwIiB5PSI2MiIgd2lkdGg9IjUiIGhlaWdodD0iMTEyIiByeD0iMi41IiBmaWxsPSIjZmZmZmZmIiBvcGFjaXR5PSIuNyIvPgogICAgPHJlY3QgeD0iNzIiIHk9Ijk4IiB3aWR0aD0iNTYiIGhlaWdodD0iNTIiIGZpbGw9IiMxZmE2YzQiLz4KICAgIDxyZWN0IHg9IjcyIiB5PSI5OCIgd2lkdGg9IjU2IiBoZWlnaHQ9IjYiIGZpbGw9IiNmZmZmZmYiIG9wYWNpdHk9Ii44NSIvPgogICAgPHJlY3QgeD0iNzIiIHk9IjE0NCIgd2lkdGg9IjU2IiBoZWlnaHQ9IjYiIGZpbGw9IiNmZmZmZmYiIG9wYWNpdHk9Ii44NSIvPgogICAgPHRleHQgeD0iMTAwIiB5PSIxMjEiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNSIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+QUY8L3RleHQ+CiAgICA8dGV4dCB4PSIxMDAiIHk9IjEzNiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjkiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPjI1MCBtbDwvdGV4dD4KICAgIDxyZWN0IHg9Ijc0IiB5PSIxODQiIHdpZHRoPSI1MiIgaGVpZ2h0PSI0IiByeD0iMiIgZmlsbD0iIzlmYzllMCIvPgogIDwvZz4KPC9zdmc+" alt="250 ml">
+      <div class="name">250 ml</div>
+      <div class="amount">&#8377;900 <small>/ pack of 48</small></div>
+      <ul><li>Pack of 48 bottles</li><li>Minimum 25 packs</li><li>Delivered to your door</li></ul>
+      <button class="btn ghost" data-open-order>Choose plan</button>
+    </div>
+    <div class="price reveal">
+      <div class="size">Bottles</div>
+      <img class="prod-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMDAgMjAwIj4KICA8ZGVmcz4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0iYjc1MC1nbGFzcyIgeDE9IjAiIHgyPSIxIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjYmZlM2YwIi8+CiAgICAgIDxzdG9wIG9mZnNldD0iLjQ1IiBzdG9wLWNvbG9yPSIjZjdmY2ZlIi8+CiAgICAgIDxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iI2I1ZGNlYyIvPgogICAgPC9saW5lYXJHcmFkaWVudD4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0iYjc1MC13YXRlciIgeDE9IjAiIHgyPSIxIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjN2ZkOGU2IiBzdG9wLW9wYWNpdHk9Ii41NSIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiMxZmE2YzQiIHN0b3Atb3BhY2l0eT0iLjQ1Ii8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogIDwvZGVmcz4KICA8Y2lyY2xlIGN4PSIxMDAiIGN5PSIxMDAiIHI9IjkyIiBmaWxsPSIjZTZmOGZiIi8+CiAgPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMTAwIDEwMCkgc2NhbGUoMC45NCkgdHJhbnNsYXRlKC0xMDAgLTEwMCkiPgogICAgPHJlY3QgeD0iODQiIHk9IjE2IiB3aWR0aD0iMzIiIGhlaWdodD0iMTgiIHJ4PSIzIiBmaWxsPSIjMWU2ZmQ2Ii8+CiAgICA8cmVjdCB4PSI4NCIgeT0iMTYiIHdpZHRoPSIzMiIgaGVpZ2h0PSI1IiByeD0iMiIgZmlsbD0iIzRmOTNlNiIvPgogICAgPHJlY3QgeD0iODgiIHk9IjM0IiB3aWR0aD0iMjQiIGhlaWdodD0iMTAiIGZpbGw9IiNkOWVjZjciIHN0cm9rZT0iIzlmYzllMCIgc3Ryb2tlLXdpZHRoPSIxIi8+CiAgICA8cGF0aCBkPSJNODAgNDQgTDEyMCA0NCBRMTI5IDYwIDEyOSA3OCBMMTI5IDE4MCBRMTI5IDE4NyAxMjIgMTg3IEw3OCAxODcgUTcxIDE4NyA3MSAxODAgTDcxIDc4IFE3MSA2MCA4MCA0NCBaIiBmaWxsPSJ1cmwoI2I3NTAtZ2xhc3MpIiBzdHJva2U9IiM4Y2M0ZGQiIHN0cm9rZS13aWR0aD0iMS41Ii8+CiAgICA8cGF0aCBkPSJNNzIgODAgSDEyOCBWMTgyIFExMjggMTg2IDEyNCAxODYgSDc2IFE3MiAxODYgNzIgMTgyIFoiIGZpbGw9InVybCgjYjc1MC13YXRlcikiLz4KICAgIDxyZWN0IHg9IjgwIiB5PSI2MiIgd2lkdGg9IjUiIGhlaWdodD0iMTEyIiByeD0iMi41IiBmaWxsPSIjZmZmZmZmIiBvcGFjaXR5PSIuNyIvPgogICAgPHJlY3QgeD0iNzIiIHk9Ijk4IiB3aWR0aD0iNTYiIGhlaWdodD0iNTIiIGZpbGw9IiMxZmE2YzQiLz4KICAgIDxyZWN0IHg9IjcyIiB5PSI5OCIgd2lkdGg9IjU2IiBoZWlnaHQ9IjYiIGZpbGw9IiNmZmZmZmYiIG9wYWNpdHk9Ii44NSIvPgogICAgPHJlY3QgeD0iNzIiIHk9IjE0NCIgd2lkdGg9IjU2IiBoZWlnaHQ9IjYiIGZpbGw9IiNmZmZmZmYiIG9wYWNpdHk9Ii44NSIvPgogICAgPHRleHQgeD0iMTAwIiB5PSIxMjEiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNSIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+QUY8L3RleHQ+CiAgICA8dGV4dCB4PSIxMDAiIHk9IjEzNiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjkiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPjc1MCBtbDwvdGV4dD4KICAgIDxyZWN0IHg9Ijc0IiB5PSIxODQiIHdpZHRoPSI1MiIgaGVpZ2h0PSI0IiByeD0iMiIgZmlsbD0iIzlmYzllMCIvPgogIDwvZz4KPC9zdmc+" alt="750 ml">
+      <div class="name">750 ml</div>
+      <div class="amount">&#8377;1500 <small>/ pack of 48</small></div>
+      <ul><li>Pack of 48 bottles</li><li>Minimum 25 packs</li><li>Delivered to your door</li></ul>
+      <button class="btn ghost" data-open-order>Choose plan</button>
+    </div>
+    <div class="price reveal">
+      <div class="size">Bottles</div>
+      <img class="prod-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMDAgMjAwIj4KICA8ZGVmcz4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0iYjEwMDAtZ2xhc3MiIHgxPSIwIiB4Mj0iMSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iI2JmZTNmMCIvPgogICAgICA8c3RvcCBvZmZzZXQ9Ii40NSIgc3RvcC1jb2xvcj0iI2Y3ZmNmZSIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiNiNWRjZWMiLz4KICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImIxMDAwLXdhdGVyIiB4MT0iMCIgeDI9IjEiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiM3ZmQ4ZTYiIHN0b3Atb3BhY2l0eT0iLjU1Ii8+CiAgICAgIDxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzFmYTZjNCIgc3RvcC1vcGFjaXR5PSIuNDUiLz4KICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgPC9kZWZzPgogIDxjaXJjbGUgY3g9IjEwMCIgY3k9IjEwMCIgcj0iOTIiIGZpbGw9IiNlNmY4ZmIiLz4KICA8ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgxMDAgMTAwKSBzY2FsZSgxLjApIHRyYW5zbGF0ZSgtMTAwIC0xMDApIj4KICAgIDxyZWN0IHg9Ijg0IiB5PSIxNiIgd2lkdGg9IjMyIiBoZWlnaHQ9IjE4IiByeD0iMyIgZmlsbD0iIzFlNmZkNiIvPgogICAgPHJlY3QgeD0iODQiIHk9IjE2IiB3aWR0aD0iMzIiIGhlaWdodD0iNSIgcng9IjIiIGZpbGw9IiM0ZjkzZTYiLz4KICAgIDxyZWN0IHg9Ijg4IiB5PSIzNCIgd2lkdGg9IjI0IiBoZWlnaHQ9IjEwIiBmaWxsPSIjZDllY2Y3IiBzdHJva2U9IiM5ZmM5ZTAiIHN0cm9rZS13aWR0aD0iMSIvPgogICAgPHBhdGggZD0iTTgwIDQ0IEwxMjAgNDQgUTEyOSA2MCAxMjkgNzggTDEyOSAxODAgUTEyOSAxODcgMTIyIDE4NyBMNzggMTg3IFE3MSAxODcgNzEgMTgwIEw3MSA3OCBRNzEgNjAgODAgNDQgWiIgZmlsbD0idXJsKCNiMTAwMC1nbGFzcykiIHN0cm9rZT0iIzhjYzRkZCIgc3Ryb2tlLXdpZHRoPSIxLjUiLz4KICAgIDxwYXRoIGQ9Ik03MiA4MCBIMTI4IFYxODIgUTEyOCAxODYgMTI0IDE4NiBINzYgUTcyIDE4NiA3MiAxODIgWiIgZmlsbD0idXJsKCNiMTAwMC13YXRlcikiLz4KICAgIDxyZWN0IHg9IjgwIiB5PSI2MiIgd2lkdGg9IjUiIGhlaWdodD0iMTEyIiByeD0iMi41IiBmaWxsPSIjZmZmZmZmIiBvcGFjaXR5PSIuNyIvPgogICAgPHJlY3QgeD0iNzIiIHk9Ijk4IiB3aWR0aD0iNTYiIGhlaWdodD0iNTIiIGZpbGw9IiMxZmE2YzQiLz4KICAgIDxyZWN0IHg9IjcyIiB5PSI5OCIgd2lkdGg9IjU2IiBoZWlnaHQ9IjYiIGZpbGw9IiNmZmZmZmYiIG9wYWNpdHk9Ii44NSIvPgogICAgPHJlY3QgeD0iNzIiIHk9IjE0NCIgd2lkdGg9IjU2IiBoZWlnaHQ9IjYiIGZpbGw9IiNmZmZmZmYiIG9wYWNpdHk9Ii44NSIvPgogICAgPHRleHQgeD0iMTAwIiB5PSIxMjEiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNSIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+QUY8L3RleHQ+CiAgICA8dGV4dCB4PSIxMDAiIHk9IjEzNiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjkiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPjEgTDwvdGV4dD4KICAgIDxyZWN0IHg9Ijc0IiB5PSIxODQiIHdpZHRoPSI1MiIgaGVpZ2h0PSI0IiByeD0iMiIgZmlsbD0iIzlmYzllMCIvPgogIDwvZz4KPC9zdmc+" alt="1000 ml">
+      <div class="name">1000 ml</div>
+      <div class="amount">&#8377;1800 <small>/ pack of 48</small></div>
+      <ul><li>Pack of 48 bottles</li><li>Minimum 25 packs</li><li>Custom sizes on request</li></ul>
+      <button class="btn ghost" data-open-order>Choose plan</button>
+    </div>
+    <div class="price reveal">
+      <div class="size">Jar</div>
+      <img class="prod-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMDAgMjAwIiB4bWxuczpjMnBhPSJodHRwOi8vYzJwYS5vcmcvbWFuaWZlc3QiPjxtZXRhZGF0YT48YzJwYTptYW5pZmVzdD5BQUFXZ21wMWJXSUFBQUFlYW5WdFpHTXljR0VBRVFBUWdBQUFxZ0E0bTNFRFl6SndZUUFBQUJaY2FuVnRZZ0FBQUVkcWRXMWtZekp0WVFBUkFCQ0FBQUNxQURpYmNRTjFjbTQ2WXpKd1lUcGhabVprWVdabE15MDFPVEV3TFRRMFlUa3RPRFF6TlMweE4yRTJNRFZpTnpJNFpESUFBQUFEbDJwMWJXSUFBQUFwYW5WdFpHTXlZWE1BRVFBUWdBQUFxZ0E0bTNFRFl6SndZUzVoYzNObGNuUnBiMjV6QUFBQUFMeHFkVzFpQUFBQVJHcDFiV1JqWW05eUFCRUFFSUFBQUtvQU9KdHhFMk15Y0dFdWFXNW5jbVZrYVdWdWRDNTJNd0FBQUFBWVl6SnphQkVZQlI2aFBUQTZ5dkVkRlJZV1FKY0FBQUJ3WTJKdmNxTnBaR002Wm05eWJXRjBiV2x0WVdkbEwzTjJaeXQ0Yld4cWFXNXpkR0Z1WTJWSlJIZ3NlRzF3T21scFpEbzJORGMzWVRjMll5MHdOREJqTFRRelpqQXRPRFExTnkxaE4yTmhZemRqTkRRMU1EQnNjbVZzWVhScGIyNXphR2x3YUhCaGNtVnVkRTltQUFBQjRtcDFiV0lBQUFCQmFuVnRaR05pYjNJQUVRQVFnQUFBcWdBNG0zRVRZekp3WVM1aFkzUnBiMjV6TG5ZeUFBQUFBQmhqTW5Ob2doY3E3ckUwOWhZNzZFWis5K2o0Q3dBQUFabGpZbTl5b21kaFkzUnBiMjV6Z3FKbVlXTjBhVzl1YTJNeWNHRXViM0JsYm1Wa2FuQmhjbUZ0WlhSbGNuT2hhMmx1WjNKbFpHbGxiblJ6Z2FKamRYSnNlQzF6Wld4bUkycDFiV0ptUFdNeWNHRXVZWE56WlhKMGFXOXVjeTlqTW5CaExtbHVaM0psWkdsbGJuUXVkak5rYUdGemFGZ2c4K0hvdVYyU1R2QTV3Q2FQK1pKV1FyZmFVM0g2bFhUMzVhY2lKYWwrT3Zla1ptRmpkR2x2Ym5nZFkyOXRMbUZ1ZEdoeWIzQnBZeTVqYkdGMVpHVXVjSEp2ZG1sa1pXUnFjR0Z5WVcxbGRHVnljNkY0SDJOdmJTNWhiblJvY205d2FXTXViM0pwWjJsdUxXTnZibVpwWkdWdVkyVm5kVzVyYm05M2JtdGtaWE5qY21sd2RHbHZibmhtUTJ4aGRXUmxJSEJ5YjNacFpHVmtJSFJvYVhNZ1ptbHNaU0JoZENCMGFHVWdjbVZ4ZFdWemRDQnZaaUJoSUhWelpYSWdZVzVrSUcxaGVTQm9ZWFpsSUdOeVpXRjBaV1FnYjNJZ2JXOWthV1pwWldRZ2RHaGxJR1pwYkdVZ1kyOXVkR1Z1ZEhNdWJYTnZablIzWVhKbFFXZGxiblNoWkc1aGJXVm1RMnhoZFdSbGNtRnNiRUZqZEdsdmJuTkpibU5zZFdSbFpQVUFBQURJYW5WdFlnQUFBRUJxZFcxa1kySnZjZ0FSQUJDQUFBQ3FBRGliY1JOak1uQmhMbWhoYzJndVpHRjBZUUFBQUFBWVl6SnphUEp4T3hPODgrL2lRTDUybllCOENLTUFBQUNBWTJKdmNxVmpZV3huWm5Ob1lUSTFObU53WVdSTkFBQUFBQUFBQUFBQUFBQUFBR1JvWVhOb1dDRGVUQTdIeFdVaUo3OGhzcWxINWNkR1AyeHk5cldPOWJQRUVweER0ZWkvYldSdVlXMWxibXAxYldKbUlHMWhibWxtWlhOMGFtVjRZMngxYzJsdmJuT0JvbVZ6ZEdGeWRCaDlabXhsYm1kMGFCa2VCQUFBQWo1cWRXMWlBQUFBSjJwMWJXUmpNbU5zQUJFQUVJQUFBS29BT0p0eEEyTXljR0V1WTJ4aGFXMHVkaklBQUFBQ0QyTmliM0tsWTJGc1oyWnphR0V5TlRacGMybG5ibUYwZFhKbGVFMXpaV3htSTJwMWJXSm1QUzlqTW5CaEwzVnlianBqTW5CaE9tRm1abVJoWm1VekxUVTVNVEF0TkRSaE9TMDRORE0xTFRFM1lUWXdOV0kzTWpoa01pOWpNbkJoTG5OcFoyNWhkSFZ5WldwcGJuTjBZVzVqWlVsRWVDeDRiWEE2YVdsa09tTmpNV001T0RrekxXTTBObUl0TkdZd05TMDVOelZpTFRreVkyWm1PV0U0TkRRek5YSmpjbVZoZEdWa1gyRnpjMlZ5ZEdsdmJuT0RvbU4xY214NExYTmxiR1lqYW5WdFltWTlZekp3WVM1aGMzTmxjblJwYjI1ekwyTXljR0V1YVc1bmNtVmthV1Z1ZEM1Mk0yUm9ZWE5vV0NEejRlaTVYWkpPOERuQUpvLzVrbFpDdDlwVGNmcVZkUGZscHlJbHFYNDY5NkpqZFhKc2VDcHpaV3htSTJwMWJXSm1QV015Y0dFdVlYTnpaWEowYVc5dWN5OWpNbkJoTG1GamRHbHZibk11ZGpKa2FHRnphRmdnU2Jud2l6THU0Uk1OUkpwYnl4RjlSN3AzY0ZYekR6amVDWUlzQmVtY0p3ZWlZM1Z5YkhncGMyVnNaaU5xZFcxaVpqMWpNbkJoTG1GemMyVnlkR2x2Ym5Ndll6SndZUzVvWVhOb0xtUmhkR0ZrYUdGemFGZ2doVVptbTNKZGVnd2M1Rld3ZXZHVlVsK1BWVmRaTHFBck9pbkhkZk9GUkVoMFkyeGhhVzFmWjJWdVpYSmhkRzl5WDJsdVptK2paRzVoYldWdlFXNTBhSEp2Y0dsaklFWnBiR1Z6WjNabGNuTnBiMjVsTVM0d0xqQnJjM0JsWTFabGNuTnBiMjVsTWk0MExqQUFBQkE0YW5WdFlnQUFBQ2hxZFcxa1l6Smpjd0FSQUJDQUFBQ3FBRGliY1FOak1uQmhMbk5wWjI1aGRIVnlaUUFBQUJBSVkySnZjdEtFV1FJU29nRW1HQ0ZaQWdvd2dnSUdNSUlCamFBREFnRUNBaFJBNWFBSzdzSTUwTDY0Zy9vR1FnVTlaMVVUQURBS0JnZ3Foa2pPUFFRREF6QkpNUmN3RlFZRFZRUUtFdzVCYm5Sb2NtOXdhV01zSUZCQ1F6RXVNQ3dHQTFVRUF4TWxRVzUwYUhKdmNHbGpJRU52Ym5SbGJuUWdRM0psWkdWdWRHbGhiSE1nVW05dmRDQkRRVEFlRncweU5qQTRNRGN4T0RRek5UWmFGdzB5T0RBNE1EWXhPVFF6TlRaYU1FUXhGekFWQmdOVkJBb1REa0Z1ZEdoeWIzQnBZeXdnVUVKRE1Ta3dKd1lEVlFRREV5QkJiblJvY205d2FXTWdRMnhoZFdSbElFTnZiblJsYm5RZ1UybG5ibWx1WnpCWk1CTUdCeXFHU000OUFnRUdDQ3FHU000OUF3RUhBMElBQkpoNkNtdkxVQmdGRk5VMHZVS2xPVnRFNmRqZDE3TDVTdXdYMExlbUZpc0JNM2RrZC8zY3lqeEZBM1FvNVM0NmZYMC9paFkwVlo3bWZiOUtGNzAzdDVPaldEQldNQTRHQTFVZER3RUIvd1FFQXdJSGdEQVZCZ05WSFNVRURqQU1CZ29yQmdFRUFZUG9YZ0lCTUF3R0ExVWRFd0VCL3dRQ01BQXdId1lEVlIwakJCZ3dGb0FVemxIaUJJRk9aRnNqK09QRXo1bytuTUhYWE1Jd0NnWUlLb1pJemowRUF3TURad0F3WkFJd01YTWRGSjRCZXRMTFZZN09SdUU5bm9xYmJBWk9abi9hQXJYeVR3RkFaZktyUHp4RjJ2UG9KTmYxK1VDZGcxWEdBakJ3WDF6ZDlXR3FZa3FtTDVTRnF3MVF5U2pyMXpKZnBKTTkrMXJkRHdTUExNT1BPakt1aVhqb1UvcFVVZUc5UndtaFkzQmhaRmtObmdBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFQWllRSTBtekMraVlUSW9oMFY4d3plYkVoSi9KL0QrZ1BqSm1Id1VUZmhBLzl6TXZuK1c5KzM2Tzg1VStsaDJwNHZhTlVBeFBnQ0xCaFJaY0huUkphTUVMRFU9PC9jMnBhOm1hbmlmZXN0PjwvbWV0YWRhdGE+CiAgPGNpcmNsZSBjeD0iMTAwIiBjeT0iMTAwIiByPSI5MiIgZmlsbD0iI2U2ZjhmYiIvPgogIDxyZWN0IHg9IjgwIiB5PSIyMCIgd2lkdGg9IjQwIiBoZWlnaHQ9IjE2IiByeD0iMyIgZmlsbD0iIzEzODQ5ZSIvPgogIDxyZWN0IHg9Ijg0IiB5PSIzNiIgd2lkdGg9IjMyIiBoZWlnaHQ9IjEyIiBmaWxsPSIjYmZlYWYzIiBzdHJva2U9IiMxZmE2YzQiIHN0cm9rZS13aWR0aD0iMiIvPgogIDxyZWN0IHg9IjUwIiB5PSI0OCIgd2lkdGg9IjEwMCIgaGVpZ2h0PSIxMzciIHJ4PSIzMCIgZmlsbD0iI2RmZjVmYSIgc3Ryb2tlPSIjMWZhNmM0IiBzdHJva2Utd2lkdGg9IjIiLz4KICA8cmVjdCB4PSI1MiIgeT0iOTAiIHdpZHRoPSI5NiIgaGVpZ2h0PSI5MyIgcng9IjI2IiBmaWxsPSIjN2ZkOGU2IiBvcGFjaXR5PSIuODUiLz4KICA8cmVjdCB4PSI2MiIgeT0iMTE4IiB3aWR0aD0iNzYiIGhlaWdodD0iNDAiIHJ4PSI0IiBmaWxsPSIjZmZmZmZmIi8+CiAgPHRleHQgeD0iMTAwIiB5PSIxNDQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIyMCIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iIzEzODQ5ZSI+MjAgTDwvdGV4dD4KPC9zdmc+" alt="20 Litre Jar">
+      <div class="name">20 Litre Jar</div>
+      <div class="amount">&#8377;200</div>
+      <ul><li>Returnable 20 litre jar</li><li>Priority delivery</li><li>Monthly invoicing</li></ul>
+      <button class="btn ghost" data-open-order>Choose plan</button>
+    </div>
+  </div>
+  <h3 class="sub-head reveal">Available on request</h3>
+  <div class="price-row">
+    <div class="price reveal">
+      <div class="size">On request</div>
+      <img class="prod-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMDAgMjAwIiB4bWxuczpjMnBhPSJodHRwOi8vYzJwYS5vcmcvbWFuaWZlc3QiPjxtZXRhZGF0YT48YzJwYTptYW5pZmVzdD5BQUFXZ21wMWJXSUFBQUFlYW5WdFpHTXljR0VBRVFBUWdBQUFxZ0E0bTNFRFl6SndZUUFBQUJaY2FuVnRZZ0FBQUVkcWRXMWtZekp0WVFBUkFCQ0FBQUNxQURpYmNRTjFjbTQ2WXpKd1lUb3hNamsyT1RBMk5DMDRNV0k0TFRRM05qY3RZams1WkMxbU1UQm1aVEkxT1RNeE9HTUFBQUFEbDJwMWJXSUFBQUFwYW5WdFpHTXlZWE1BRVFBUWdBQUFxZ0E0bTNFRFl6SndZUzVoYzNObGNuUnBiMjV6QUFBQUFMeHFkVzFpQUFBQVJHcDFiV1JqWW05eUFCRUFFSUFBQUtvQU9KdHhFMk15Y0dFdWFXNW5jbVZrYVdWdWRDNTJNd0FBQUFBWVl6SnphT3VnendaMEFueGQ2ZVV6U0hNbmMrUUFBQUJ3WTJKdmNxTnBaR002Wm05eWJXRjBiV2x0WVdkbEwzTjJaeXQ0Yld4cWFXNXpkR0Z1WTJWSlJIZ3NlRzF3T21scFpEcGpaREUwTm1SaE1pMDFZMlkzTFRSbFpqSXRZV1E1WWkxaE9ESmpZbU5tTkRjM1lqZHNjbVZzWVhScGIyNXphR2x3YUhCaGNtVnVkRTltQUFBQjRtcDFiV0lBQUFCQmFuVnRaR05pYjNJQUVRQVFnQUFBcWdBNG0zRVRZekp3WVM1aFkzUnBiMjV6TG5ZeUFBQUFBQmhqTW5Ob1pPZ1JYOTJtVkJvL2IrckNyR1hTeHdBQUFabGpZbTl5b21kaFkzUnBiMjV6Z3FKbVlXTjBhVzl1YTJNeWNHRXViM0JsYm1Wa2FuQmhjbUZ0WlhSbGNuT2hhMmx1WjNKbFpHbGxiblJ6Z2FKamRYSnNlQzF6Wld4bUkycDFiV0ptUFdNeWNHRXVZWE56WlhKMGFXOXVjeTlqTW5CaExtbHVaM0psWkdsbGJuUXVkak5rYUdGemFGZ2dwSDhiWkd2UWpXcWdMK2pvelVlejlpdGVKYmpZMmhQUXJ3Q0ozN1FCSU4ra1ptRmpkR2x2Ym5nZFkyOXRMbUZ1ZEdoeWIzQnBZeTVqYkdGMVpHVXVjSEp2ZG1sa1pXUnFjR0Z5WVcxbGRHVnljNkY0SDJOdmJTNWhiblJvY205d2FXTXViM0pwWjJsdUxXTnZibVpwWkdWdVkyVm5kVzVyYm05M2JtdGtaWE5qY21sd2RHbHZibmhtUTJ4aGRXUmxJSEJ5YjNacFpHVmtJSFJvYVhNZ1ptbHNaU0JoZENCMGFHVWdjbVZ4ZFdWemRDQnZaaUJoSUhWelpYSWdZVzVrSUcxaGVTQm9ZWFpsSUdOeVpXRjBaV1FnYjNJZ2JXOWthV1pwWldRZ2RHaGxJR1pwYkdVZ1kyOXVkR1Z1ZEhNdWJYTnZablIzWVhKbFFXZGxiblNoWkc1aGJXVm1RMnhoZFdSbGNtRnNiRUZqZEdsdmJuTkpibU5zZFdSbFpQVUFBQURJYW5WdFlnQUFBRUJxZFcxa1kySnZjZ0FSQUJDQUFBQ3FBRGliY1JOak1uQmhMbWhoYzJndVpHRjBZUUFBQUFBWVl6SnphSXJuN3VRS1M4Tm5rRS93czhuc080SUFBQUNBWTJKdmNxVmpZV3huWm5Ob1lUSTFObU53WVdSTkFBQUFBQUFBQUFBQUFBQUFBR1JvWVhOb1dDQlkwRUZITk8rRDFZVzN0S2ZBN3lJT0lsalZLOGlTWkFKd3RtSng3L1VRNUdSdVlXMWxibXAxYldKbUlHMWhibWxtWlhOMGFtVjRZMngxYzJsdmJuT0JvbVZ6ZEdGeWRCaDlabXhsYm1kMGFCa2VCQUFBQWo1cWRXMWlBQUFBSjJwMWJXUmpNbU5zQUJFQUVJQUFBS29BT0p0eEEyTXljR0V1WTJ4aGFXMHVkaklBQUFBQ0QyTmliM0tsWTJGc1oyWnphR0V5TlRacGMybG5ibUYwZFhKbGVFMXpaV3htSTJwMWJXSm1QUzlqTW5CaEwzVnlianBqTW5CaE9qRXlPVFk1TURZMExUZ3hZamd0TkRjMk55MWlPVGxrTFdZeE1HWmxNalU1TXpFNFl5OWpNbkJoTG5OcFoyNWhkSFZ5WldwcGJuTjBZVzVqWlVsRWVDeDRiWEE2YVdsa09tTTJZV0k1T1ROaUxXTm1aR010TkRrNU1DMDRZalE1TFRVNU1tVTROVEExT0dVd09ISmpjbVZoZEdWa1gyRnpjMlZ5ZEdsdmJuT0RvbU4xY214NExYTmxiR1lqYW5WdFltWTlZekp3WVM1aGMzTmxjblJwYjI1ekwyTXljR0V1YVc1bmNtVmthV1Z1ZEM1Mk0yUm9ZWE5vV0NDa2Z4dGthOUNOYXFBdjZPak5SN1AySzE0bHVOamFFOUN2QUluZnRBRWczNkpqZFhKc2VDcHpaV3htSTJwMWJXSm1QV015Y0dFdVlYTnpaWEowYVc5dWN5OWpNbkJoTG1GamRHbHZibk11ZGpKa2FHRnphRmdnY00rajBxbGRaamdXeUJsSG05ckNZT25HSFB4RzFYQVRVL1RjU1JrUHFUYWlZM1Z5YkhncGMyVnNaaU5xZFcxaVpqMWpNbkJoTG1GemMyVnlkR2x2Ym5Ndll6SndZUzVvWVhOb0xtUmhkR0ZrYUdGemFGZ2dzbXlHaFpTb1JvWXNGNE5TOUppYlZmUFl0ZmN4V3BFeEkyOERDY1RhZWFOMFkyeGhhVzFmWjJWdVpYSmhkRzl5WDJsdVptK2paRzVoYldWdlFXNTBhSEp2Y0dsaklFWnBiR1Z6WjNabGNuTnBiMjVsTVM0d0xqQnJjM0JsWTFabGNuTnBiMjVsTWk0MExqQUFBQkE0YW5WdFlnQUFBQ2hxZFcxa1l6Smpjd0FSQUJDQUFBQ3FBRGliY1FOak1uQmhMbk5wWjI1aGRIVnlaUUFBQUJBSVkySnZjdEtFV1FJU29nRW1HQ0ZaQWdvd2dnSUdNSUlCamFBREFnRUNBaFJBNWFBSzdzSTUwTDY0Zy9vR1FnVTlaMVVUQURBS0JnZ3Foa2pPUFFRREF6QkpNUmN3RlFZRFZRUUtFdzVCYm5Sb2NtOXdhV01zSUZCQ1F6RXVNQ3dHQTFVRUF4TWxRVzUwYUhKdmNHbGpJRU52Ym5SbGJuUWdRM0psWkdWdWRHbGhiSE1nVW05dmRDQkRRVEFlRncweU5qQTRNRGN4T0RRek5UWmFGdzB5T0RBNE1EWXhPVFF6TlRaYU1FUXhGekFWQmdOVkJBb1REa0Z1ZEdoeWIzQnBZeXdnVUVKRE1Ta3dKd1lEVlFRREV5QkJiblJvY205d2FXTWdRMnhoZFdSbElFTnZiblJsYm5RZ1UybG5ibWx1WnpCWk1CTUdCeXFHU000OUFnRUdDQ3FHU000OUF3RUhBMElBQkpoNkNtdkxVQmdGRk5VMHZVS2xPVnRFNmRqZDE3TDVTdXdYMExlbUZpc0JNM2RrZC8zY3lqeEZBM1FvNVM0NmZYMC9paFkwVlo3bWZiOUtGNzAzdDVPaldEQldNQTRHQTFVZER3RUIvd1FFQXdJSGdEQVZCZ05WSFNVRURqQU1CZ29yQmdFRUFZUG9YZ0lCTUF3R0ExVWRFd0VCL3dRQ01BQXdId1lEVlIwakJCZ3dGb0FVemxIaUJJRk9aRnNqK09QRXo1bytuTUhYWE1Jd0NnWUlLb1pJemowRUF3TURad0F3WkFJd01YTWRGSjRCZXRMTFZZN09SdUU5bm9xYmJBWk9abi9hQXJYeVR3RkFaZktyUHp4RjJ2UG9KTmYxK1VDZGcxWEdBakJ3WDF6ZDlXR3FZa3FtTDVTRnF3MVF5U2pyMXpKZnBKTTkrMXJkRHdTUExNT1BPakt1aVhqb1UvcFVVZUc5UndtaFkzQmhaRmtObmdBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFQWllRTDJyWjZmL0pPOE5QL3VXU0M2OGE4TmVUVFYrZUtnVHd0VHVZTDZsUmZzdjBhd3poRGNjQlordDM4NzV4S2VVd2xEZGRuakVDdkx2NjIvZC9HNDdDUVU9PC9jMnBhOm1hbmlmZXN0PjwvbWV0YWRhdGE+CiAgPGNpcmNsZSBjeD0iMTAwIiBjeT0iMTAwIiByPSI5MiIgZmlsbD0iI2U2ZjhmYiIvPgogIDxyZWN0IHg9IjY1IiB5PSIyMiIgd2lkdGg9IjcwIiBoZWlnaHQ9IjEyIiByeD0iNCIgZmlsbD0iIzEzODQ5ZSIvPgogIDxyZWN0IHg9IjcwIiB5PSIzNCIgd2lkdGg9IjYwIiBoZWlnaHQ9IjEyMCIgcng9IjEwIiBmaWxsPSIjZmZmZmZmIiBzdHJva2U9IiMxZmE2YzQiIHN0cm9rZS13aWR0aD0iMyIvPgogIDxwYXRoIGQ9Ik0xMDAgNzAgQzEwMCA3MCA4OCA4NCA4OCA5NCBhMTIgMTIgMCAwIDAgMjQgMCBDMTEyIDg0IDEwMCA3MCAxMDAgNzAgWiIgZmlsbD0iIzFmYTZjNCIvPgogIDxyZWN0IHg9IjkyIiB5PSIxNTQiIHdpZHRoPSIxNiIgaGVpZ2h0PSIxMCIgZmlsbD0iIzEzODQ5ZSIvPgogIDxwYXRoIGQ9Ik0xMDAgMTY0IFYxNzYiIHN0cm9rZT0iIzEzODQ5ZSIgc3Ryb2tlLXdpZHRoPSI0IiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KPC9zdmc+" alt="Water filter">
+      <div class="name">Filters</div>
+      <div class="amount">Call</div>
+      <ul><li>Supply and service</li><li>Custom options available</li><li>Quote on request</li></ul>
+      <a class="btn ghost" href="tel:+919800000000">Call for details</a>
+    </div>
+  </div>
+  <p class="tax-note">Prices shown exclude GST. Final amount is calculated at checkout.</p>
+</section>
+
+<!-- Premixes & vending -->
+<section class="premix" id="premix">
+  <div class="center reveal">
+    <span class="eyebrow">Premixes &amp; vending</span>
+    <h2>Beyond water, <strong>for your business.</strong></h2>
+    <p class="lead">Coffee and tea premixes, and coffee and tea vending machines, for offices, canteens and shops. Call or WhatsApp us for details and pricing.</p>
+  </div>
+  <div class="cards two">
+    <div class="card reveal">
+      <img class="card-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMDAgMjAwIiB4bWxuczpjMnBhPSJodHRwOi8vYzJwYS5vcmcvbWFuaWZlc3QiPjxtZXRhZGF0YT48YzJwYTptYW5pZmVzdD5BQUFXZ21wMWJXSUFBQUFlYW5WdFpHTXljR0VBRVFBUWdBQUFxZ0E0bTNFRFl6SndZUUFBQUJaY2FuVnRZZ0FBQUVkcWRXMWtZekp0WVFBUkFCQ0FBQUNxQURpYmNRTjFjbTQ2WXpKd1lUcG1NemczWVRsaVppMW1OV0U1TFRRME0yTXRPVGcxTWkwd1pHRTNPVGhsWmpabVlqY0FBQUFEbDJwMWJXSUFBQUFwYW5WdFpHTXlZWE1BRVFBUWdBQUFxZ0E0bTNFRFl6SndZUzVoYzNObGNuUnBiMjV6QUFBQUFMeHFkVzFpQUFBQVJHcDFiV1JqWW05eUFCRUFFSUFBQUtvQU9KdHhFMk15Y0dFdWFXNW5jbVZrYVdWdWRDNTJNd0FBQUFBWVl6SnphR0dVcktZNXJtRDRTR3ZrenB2TnA1OEFBQUJ3WTJKdmNxTnBaR002Wm05eWJXRjBiV2x0WVdkbEwzTjJaeXQ0Yld4cWFXNXpkR0Z1WTJWSlJIZ3NlRzF3T21scFpEb3pZVGxoT1RoaU55MHlOR05oTFRRNVpHRXRPRGhsT0Mxa1ptTXdOVGM0T0RJMk1HSnNjbVZzWVhScGIyNXphR2x3YUhCaGNtVnVkRTltQUFBQjRtcDFiV0lBQUFCQmFuVnRaR05pYjNJQUVRQVFnQUFBcWdBNG0zRVRZekp3WVM1aFkzUnBiMjV6TG5ZeUFBQUFBQmhqTW5Ob0JHQU12UWo0S2dIRWljSDVObnNOTUFBQUFabGpZbTl5b21kaFkzUnBiMjV6Z3FKbVlXTjBhVzl1YTJNeWNHRXViM0JsYm1Wa2FuQmhjbUZ0WlhSbGNuT2hhMmx1WjNKbFpHbGxiblJ6Z2FKamRYSnNlQzF6Wld4bUkycDFiV0ptUFdNeWNHRXVZWE56WlhKMGFXOXVjeTlqTW5CaExtbHVaM0psWkdsbGJuUXVkak5rYUdGemFGZ2d6Q2s1dkVKaUhlZ0J1emFtdDEwWVl0VzBTb1FpZVBYVjB3TjY4dUxSWlhla1ptRmpkR2x2Ym5nZFkyOXRMbUZ1ZEdoeWIzQnBZeTVqYkdGMVpHVXVjSEp2ZG1sa1pXUnFjR0Z5WVcxbGRHVnljNkY0SDJOdmJTNWhiblJvY205d2FXTXViM0pwWjJsdUxXTnZibVpwWkdWdVkyVm5kVzVyYm05M2JtdGtaWE5qY21sd2RHbHZibmhtUTJ4aGRXUmxJSEJ5YjNacFpHVmtJSFJvYVhNZ1ptbHNaU0JoZENCMGFHVWdjbVZ4ZFdWemRDQnZaaUJoSUhWelpYSWdZVzVrSUcxaGVTQm9ZWFpsSUdOeVpXRjBaV1FnYjNJZ2JXOWthV1pwWldRZ2RHaGxJR1pwYkdVZ1kyOXVkR1Z1ZEhNdWJYTnZablIzWVhKbFFXZGxiblNoWkc1aGJXVm1RMnhoZFdSbGNtRnNiRUZqZEdsdmJuTkpibU5zZFdSbFpQVUFBQURJYW5WdFlnQUFBRUJxZFcxa1kySnZjZ0FSQUJDQUFBQ3FBRGliY1JOak1uQmhMbWhoYzJndVpHRjBZUUFBQUFBWVl6SnphR0dIazNwUU1VdUNPT0FTUSs3TVEyZ0FBQUNBWTJKdmNxVmpZV3huWm5Ob1lUSTFObU53WVdSTkFBQUFBQUFBQUFBQUFBQUFBR1JvWVhOb1dDQ3JjbWk5TGg2UFRKUmRNNmtIcVoxb0dmS3JkVnUwUGV4MUtXS20wRXJ5MDJSdVlXMWxibXAxYldKbUlHMWhibWxtWlhOMGFtVjRZMngxYzJsdmJuT0JvbVZ6ZEdGeWRCaDlabXhsYm1kMGFCa2VCQUFBQWo1cWRXMWlBQUFBSjJwMWJXUmpNbU5zQUJFQUVJQUFBS29BT0p0eEEyTXljR0V1WTJ4aGFXMHVkaklBQUFBQ0QyTmliM0tsWTJGc1oyWnphR0V5TlRacGMybG5ibUYwZFhKbGVFMXpaV3htSTJwMWJXSm1QUzlqTW5CaEwzVnlianBqTW5CaE9tWXpPRGRoT1dKbUxXWTFZVGt0TkRRell5MDVPRFV5TFRCa1lUYzVPR1ZtTm1aaU55OWpNbkJoTG5OcFoyNWhkSFZ5WldwcGJuTjBZVzVqWlVsRWVDeDRiWEE2YVdsa09qUXpOakkzWmpsbUxUbGpaVGd0TkdabFlpMWhNMlkwTFRreU4yUTJOMlpoTjJSaFkzSmpjbVZoZEdWa1gyRnpjMlZ5ZEdsdmJuT0RvbU4xY214NExYTmxiR1lqYW5WdFltWTlZekp3WVM1aGMzTmxjblJwYjI1ekwyTXljR0V1YVc1bmNtVmthV1Z1ZEM1Mk0yUm9ZWE5vV0NETUtUbThRbUlkNkFHN05xYTNYUmhpMWJSS2hDSjQ5ZFhUQTNyeTR0RmxkNkpqZFhKc2VDcHpaV3htSTJwMWJXSm1QV015Y0dFdVlYTnpaWEowYVc5dWN5OWpNbkJoTG1GamRHbHZibk11ZGpKa2FHRnphRmdnMWYzZVZiem8rMkR4OThGNE4wVExZMHdQM3h2dHV5WDZJR3ZZZWxBZVZJNmlZM1Z5YkhncGMyVnNaaU5xZFcxaVpqMWpNbkJoTG1GemMyVnlkR2x2Ym5Ndll6SndZUzVvWVhOb0xtUmhkR0ZrYUdGemFGZ2dTMXhESUxxQWFEbzhweXlENm9ra2UyM2Yrd1E3aXFPTEhGdk93SDk5bUVCMFkyeGhhVzFmWjJWdVpYSmhkRzl5WDJsdVptK2paRzVoYldWdlFXNTBhSEp2Y0dsaklFWnBiR1Z6WjNabGNuTnBiMjVsTVM0d0xqQnJjM0JsWTFabGNuTnBiMjVsTWk0MExqQUFBQkE0YW5WdFlnQUFBQ2hxZFcxa1l6Smpjd0FSQUJDQUFBQ3FBRGliY1FOak1uQmhMbk5wWjI1aGRIVnlaUUFBQUJBSVkySnZjdEtFV1FJU29nRW1HQ0ZaQWdvd2dnSUdNSUlCamFBREFnRUNBaFJBNWFBSzdzSTUwTDY0Zy9vR1FnVTlaMVVUQURBS0JnZ3Foa2pPUFFRREF6QkpNUmN3RlFZRFZRUUtFdzVCYm5Sb2NtOXdhV01zSUZCQ1F6RXVNQ3dHQTFVRUF4TWxRVzUwYUhKdmNHbGpJRU52Ym5SbGJuUWdRM0psWkdWdWRHbGhiSE1nVW05dmRDQkRRVEFlRncweU5qQTRNRGN4T0RRek5UWmFGdzB5T0RBNE1EWXhPVFF6TlRaYU1FUXhGekFWQmdOVkJBb1REa0Z1ZEdoeWIzQnBZeXdnVUVKRE1Ta3dKd1lEVlFRREV5QkJiblJvY205d2FXTWdRMnhoZFdSbElFTnZiblJsYm5RZ1UybG5ibWx1WnpCWk1CTUdCeXFHU000OUFnRUdDQ3FHU000OUF3RUhBMElBQkpoNkNtdkxVQmdGRk5VMHZVS2xPVnRFNmRqZDE3TDVTdXdYMExlbUZpc0JNM2RrZC8zY3lqeEZBM1FvNVM0NmZYMC9paFkwVlo3bWZiOUtGNzAzdDVPaldEQldNQTRHQTFVZER3RUIvd1FFQXdJSGdEQVZCZ05WSFNVRURqQU1CZ29yQmdFRUFZUG9YZ0lCTUF3R0ExVWRFd0VCL3dRQ01BQXdId1lEVlIwakJCZ3dGb0FVemxIaUJJRk9aRnNqK09QRXo1bytuTUhYWE1Jd0NnWUlLb1pJemowRUF3TURad0F3WkFJd01YTWRGSjRCZXRMTFZZN09SdUU5bm9xYmJBWk9abi9hQXJYeVR3RkFaZktyUHp4RjJ2UG9KTmYxK1VDZGcxWEdBakJ3WDF6ZDlXR3FZa3FtTDVTRnF3MVF5U2pyMXpKZnBKTTkrMXJkRHdTUExNT1BPakt1aVhqb1UvcFVVZUc5UndtaFkzQmhaRmtObmdBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFQWllRT1UvbjlPcGFlTWx0aUlUZldZZ0FqeU1OSDluSllzaUVZU1BkL3U5czRZZHllVURWMiszU2x3dFdEaXBiOEhLdXdiOEU0YXJOTklsWm1mcTJyRGdCYzQ9PC9jMnBhOm1hbmlmZXN0PjwvbWV0YWRhdGE+CiAgPGNpcmNsZSBjeD0iMTAwIiBjeT0iMTAwIiByPSI5MiIgZmlsbD0iI2U2ZjhmYiIvPgogIDxwYXRoIGQ9Ik04OCA0NCBxLTYgLTkgMCAtMTYgTTExMiA0NCBxLTYgLTkgMCAtMTYiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzdmZDhlNiIgc3Ryb2tlLXdpZHRoPSIzIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KICA8cmVjdCB4PSI2MCIgeT0iNjAiIHdpZHRoPSI4MCIgaGVpZ2h0PSIxMTIiIHJ4PSIxMCIgZmlsbD0iI2ZmZmZmZiIgc3Ryb2tlPSIjMWZhNmM0IiBzdHJva2Utd2lkdGg9IjMiLz4KICA8cmVjdCB4PSI1NSIgeT0iNTAiIHdpZHRoPSI5MCIgaGVpZ2h0PSIxNCIgcng9IjUiIGZpbGw9IiMxMzg0OWUiLz4KICA8cmVjdCB4PSI3MCIgeT0iOTAiIHdpZHRoPSI2MCIgaGVpZ2h0PSI0NCIgcng9IjYiIGZpbGw9IiNkZmY1ZmEiLz4KICA8dGV4dCB4PSIxMDAiIHk9IjExNyIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjExIiBmb250LXdlaWdodD0iNzAwIiBmaWxsPSIjMTM4NDllIj5QUkVNSVg8L3RleHQ+CiAgPHRleHQgeD0iMTAwIiB5PSIxNTAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSI5IiBmaWxsPSIjNWQ3NzgwIj5DT0ZGRUUgwrcgVEVBPC90ZXh0Pgo8L3N2Zz4=" alt="Coffee and tea premix">
+      <h3>Coffee &amp; Tea Premixes</h3>
+      <p>Ready-to-brew coffee and tea premixes, supplied in bulk for offices, canteens and shops.</p>
+      <div class="card-actions">
+        <a class="btn small" href="tel:+919800000000">Call us</a>
+        <a class="btn small ghost" href="https://wa.me/919800000000" target="_blank" rel="noopener">WhatsApp</a>
+      </div>
+    </div>
+    <div class="card reveal">
+      <img class="card-img" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMDAgMjAwIiB4bWxuczpjMnBhPSJodHRwOi8vYzJwYS5vcmcvbWFuaWZlc3QiPjxtZXRhZGF0YT48YzJwYTptYW5pZmVzdD5BQUFXZ21wMWJXSUFBQUFlYW5WdFpHTXljR0VBRVFBUWdBQUFxZ0E0bTNFRFl6SndZUUFBQUJaY2FuVnRZZ0FBQUVkcWRXMWtZekp0WVFBUkFCQ0FBQUNxQURpYmNRTjFjbTQ2WXpKd1lUbzJaVGczT0dFMFl5MDFabVJsTFRSaU0yTXRZVGMzTkMxbE4yTXdOemRrTVdZeU5qZ0FBQUFEbDJwMWJXSUFBQUFwYW5WdFpHTXlZWE1BRVFBUWdBQUFxZ0E0bTNFRFl6SndZUzVoYzNObGNuUnBiMjV6QUFBQUFMeHFkVzFpQUFBQVJHcDFiV1JqWW05eUFCRUFFSUFBQUtvQU9KdHhFMk15Y0dFdWFXNW5jbVZrYVdWdWRDNTJNd0FBQUFBWVl6SnphTjA1V1JiQW9aRDJyd3ZLcktGL2kyQUFBQUJ3WTJKdmNxTnBaR002Wm05eWJXRjBiV2x0WVdkbEwzTjJaeXQ0Yld4cWFXNXpkR0Z1WTJWSlJIZ3NlRzF3T21scFpEb3hNMkZoT1RFeVlTMHhaamd4TFRReU5ESXRZVGc1WWkweE1ETXdZV1V5TVRjME5USnNjbVZzWVhScGIyNXphR2x3YUhCaGNtVnVkRTltQUFBQjRtcDFiV0lBQUFCQmFuVnRaR05pYjNJQUVRQVFnQUFBcWdBNG0zRVRZekp3WVM1aFkzUnBiMjV6TG5ZeUFBQUFBQmhqTW5Ob1k1VUxJNHQrcEt4d0tVeVhkNVRVR1FBQUFabGpZbTl5b21kaFkzUnBiMjV6Z3FKbVlXTjBhVzl1YTJNeWNHRXViM0JsYm1Wa2FuQmhjbUZ0WlhSbGNuT2hhMmx1WjNKbFpHbGxiblJ6Z2FKamRYSnNlQzF6Wld4bUkycDFiV0ptUFdNeWNHRXVZWE56WlhKMGFXOXVjeTlqTW5CaExtbHVaM0psWkdsbGJuUXVkak5rYUdGemFGZ2dNSURDKys1Mnlaa0Z5Y2JFZkFlSFRRMWwzQ0QraTBkcWQzUndXcGxtRDlha1ptRmpkR2x2Ym5nZFkyOXRMbUZ1ZEdoeWIzQnBZeTVqYkdGMVpHVXVjSEp2ZG1sa1pXUnFjR0Z5WVcxbGRHVnljNkY0SDJOdmJTNWhiblJvY205d2FXTXViM0pwWjJsdUxXTnZibVpwWkdWdVkyVm5kVzVyYm05M2JtdGtaWE5qY21sd2RHbHZibmhtUTJ4aGRXUmxJSEJ5YjNacFpHVmtJSFJvYVhNZ1ptbHNaU0JoZENCMGFHVWdjbVZ4ZFdWemRDQnZaaUJoSUhWelpYSWdZVzVrSUcxaGVTQm9ZWFpsSUdOeVpXRjBaV1FnYjNJZ2JXOWthV1pwWldRZ2RHaGxJR1pwYkdVZ1kyOXVkR1Z1ZEhNdWJYTnZablIzWVhKbFFXZGxiblNoWkc1aGJXVm1RMnhoZFdSbGNtRnNiRUZqZEdsdmJuTkpibU5zZFdSbFpQVUFBQURJYW5WdFlnQUFBRUJxZFcxa1kySnZjZ0FSQUJDQUFBQ3FBRGliY1JOak1uQmhMbWhoYzJndVpHRjBZUUFBQUFBWVl6SnphTERoMzc0VWVVWGMvaUhwem56aitwWUFBQUNBWTJKdmNxVmpZV3huWm5Ob1lUSTFObU53WVdSTkFBQUFBQUFBQUFBQUFBQUFBR1JvWVhOb1dDRGZXWjlpRmNsZG9jNldJQzVmbEl5TVhFOFpHTXMyQW5IeXVxWnBhZXVFUG1SdVlXMWxibXAxYldKbUlHMWhibWxtWlhOMGFtVjRZMngxYzJsdmJuT0JvbVZ6ZEdGeWRCaDlabXhsYm1kMGFCa2VCQUFBQWo1cWRXMWlBQUFBSjJwMWJXUmpNbU5zQUJFQUVJQUFBS29BT0p0eEEyTXljR0V1WTJ4aGFXMHVkaklBQUFBQ0QyTmliM0tsWTJGc1oyWnphR0V5TlRacGMybG5ibUYwZFhKbGVFMXpaV3htSTJwMWJXSm1QUzlqTW5CaEwzVnlianBqTW5CaE9qWmxPRGM0WVRSakxUVm1aR1V0TkdJell5MWhOemMwTFdVM1l6QTNOMlF4WmpJMk9DOWpNbkJoTG5OcFoyNWhkSFZ5WldwcGJuTjBZVzVqWlVsRWVDeDRiWEE2YVdsa09tSTFNVGN4TmpSbExXWmlPV1l0TkRFeU5pMDVNRGRtTFRSalpUUXlPR1l3TVdJeFpYSmpjbVZoZEdWa1gyRnpjMlZ5ZEdsdmJuT0RvbU4xY214NExYTmxiR1lqYW5WdFltWTlZekp3WVM1aGMzTmxjblJwYjI1ekwyTXljR0V1YVc1bmNtVmthV1Z1ZEM1Mk0yUm9ZWE5vV0NBd2dNTDc3bmJKbVFYSnhzUjhCNGRORFdYY0lQNkxSMnAzZEhCYW1XWVAxcUpqZFhKc2VDcHpaV3htSTJwMWJXSm1QV015Y0dFdVlYTnpaWEowYVc5dWN5OWpNbkJoTG1GamRHbHZibk11ZGpKa2FHRnphRmdnNVI2UXByUnZnZGlyQVJkQTNsSURyMEdkWlVINVJZdm1YaDRYbmFNVllHR2lZM1Z5YkhncGMyVnNaaU5xZFcxaVpqMWpNbkJoTG1GemMyVnlkR2x2Ym5Ndll6SndZUzVvWVhOb0xtUmhkR0ZrYUdGemFGZ2dwRkxVSE5SaGg1QmlsVGpNdzhxem5FcEdqK3BHNjBmL0tybzBtNWd1NVZsMFkyeGhhVzFmWjJWdVpYSmhkRzl5WDJsdVptK2paRzVoYldWdlFXNTBhSEp2Y0dsaklFWnBiR1Z6WjNabGNuTnBiMjVsTVM0d0xqQnJjM0JsWTFabGNuTnBiMjVsTWk0MExqQUFBQkE0YW5WdFlnQUFBQ2hxZFcxa1l6Smpjd0FSQUJDQUFBQ3FBRGliY1FOak1uQmhMbk5wWjI1aGRIVnlaUUFBQUJBSVkySnZjdEtFV1FJU29nRW1HQ0ZaQWdvd2dnSUdNSUlCamFBREFnRUNBaFJBNWFBSzdzSTUwTDY0Zy9vR1FnVTlaMVVUQURBS0JnZ3Foa2pPUFFRREF6QkpNUmN3RlFZRFZRUUtFdzVCYm5Sb2NtOXdhV01zSUZCQ1F6RXVNQ3dHQTFVRUF4TWxRVzUwYUhKdmNHbGpJRU52Ym5SbGJuUWdRM0psWkdWdWRHbGhiSE1nVW05dmRDQkRRVEFlRncweU5qQTRNRGN4T0RRek5UWmFGdzB5T0RBNE1EWXhPVFF6TlRaYU1FUXhGekFWQmdOVkJBb1REa0Z1ZEdoeWIzQnBZeXdnVUVKRE1Ta3dKd1lEVlFRREV5QkJiblJvY205d2FXTWdRMnhoZFdSbElFTnZiblJsYm5RZ1UybG5ibWx1WnpCWk1CTUdCeXFHU000OUFnRUdDQ3FHU000OUF3RUhBMElBQkpoNkNtdkxVQmdGRk5VMHZVS2xPVnRFNmRqZDE3TDVTdXdYMExlbUZpc0JNM2RrZC8zY3lqeEZBM1FvNVM0NmZYMC9paFkwVlo3bWZiOUtGNzAzdDVPaldEQldNQTRHQTFVZER3RUIvd1FFQXdJSGdEQVZCZ05WSFNVRURqQU1CZ29yQmdFRUFZUG9YZ0lCTUF3R0ExVWRFd0VCL3dRQ01BQXdId1lEVlIwakJCZ3dGb0FVemxIaUJJRk9aRnNqK09QRXo1bytuTUhYWE1Jd0NnWUlLb1pJemowRUF3TURad0F3WkFJd01YTWRGSjRCZXRMTFZZN09SdUU5bm9xYmJBWk9abi9hQXJYeVR3RkFaZktyUHp4RjJ2UG9KTmYxK1VDZGcxWEdBakJ3WDF6ZDlXR3FZa3FtTDVTRnF3MVF5U2pyMXpKZnBKTTkrMXJkRHdTUExNT1BPakt1aVhqb1UvcFVVZUc5UndtaFkzQmhaRmtObmdBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFQWllRQU5tQzNmVSsxYVUyUG1LMnBFZjY4cGVzV0FHQXh1KzcvSU14STF3UFNOOXhFQ2ROWTdHOFNkb3crMjRlTGFQRFdLTk1FWWFEblBKU3V4RHlmaGVtblU9PC9jMnBhOm1hbmlmZXN0PjwvbWV0YWRhdGE+CiAgPGNpcmNsZSBjeD0iMTAwIiBjeT0iMTAwIiByPSI5MiIgZmlsbD0iI2U2ZjhmYiIvPgogIDxyZWN0IHg9IjU4IiB5PSIyOCIgd2lkdGg9Ijg0IiBoZWlnaHQ9IjE1OCIgcng9IjgiIGZpbGw9IiNmZmZmZmYiIHN0cm9rZT0iIzEzODQ5ZSIgc3Ryb2tlLXdpZHRoPSIzIi8+CiAgPHJlY3QgeD0iNjgiIHk9IjQwIiB3aWR0aD0iNjQiIGhlaWdodD0iNzAiIHJ4PSI0IiBmaWxsPSIjN2ZkOGU2Ii8+CiAgPGNpcmNsZSBjeD0iODIiIGN5PSI2MiIgcj0iNyIgZmlsbD0iI2Y1YzU0MiIvPgogIDxjaXJjbGUgY3g9IjEwMCIgY3k9IjYyIiByPSI3IiBmaWxsPSIjMWZhNmM0Ii8+CiAgPGNpcmNsZSBjeD0iMTE4IiBjeT0iNjIiIHI9IjciIGZpbGw9IiNmZmZmZmYiLz4KICA8Y2lyY2xlIGN4PSI4MiIgY3k9Ijg4IiByPSI3IiBmaWxsPSIjZmZmZmZmIi8+CiAgPGNpcmNsZSBjeD0iMTAwIiBjeT0iODgiIHI9IjciIGZpbGw9IiNmNWM1NDIiLz4KICA8Y2lyY2xlIGN4PSIxMTgiIGN5PSI4OCIgcj0iNyIgZmlsbD0iIzFmYTZjNCIvPgogIDxyZWN0IHg9IjY4IiB5PSIxMjIiIHdpZHRoPSI2NCIgaGVpZ2h0PSI0NiIgcng9IjQiIGZpbGw9IiNkZmU5ZWMiLz4KICA8Y2lyY2xlIGN4PSI4NCIgY3k9IjE0NSIgcj0iNSIgZmlsbD0iIzFmYTZjNCIvPgogIDxjaXJjbGUgY3g9IjEwMCIgY3k9IjE0NSIgcj0iNSIgZmlsbD0iIzFmYTZjNCIvPgogIDxjaXJjbGUgY3g9IjExNiIgY3k9IjE0NSIgcj0iNSIgZmlsbD0iIzFmYTZjNCIvPgogIDxyZWN0IHg9IjY2IiB5PSIxODAiIHdpZHRoPSI2OCIgaGVpZ2h0PSI2IiByeD0iMiIgZmlsbD0iIzEzODQ5ZSIvPgo8L3N2Zz4=" alt="Coffee and tea vending machine">
+      <h3>Coffee &amp; Tea Vending Machines</h3>
+      <p>We supply coffee and tea vending machines only. We install the machine at your location, keep it stocked and handle servicing.</p>
+      <div class="card-actions">
+        <a class="btn small" href="tel:+919800000000">Call us</a>
+        <a class="btn small ghost" href="https://wa.me/919800000000" target="_blank" rel="noopener">WhatsApp</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Quote -->
+<section id="quote">
+  <div class="quote-grid">
+    <div class="reveal">
+      <span class="eyebrow">Get a quote</span>
+      <h2>Get a quote in <strong>one minute.</strong></h2>
+      <p class="lead">Tell us a little about your needs and we'll send you a tailored quote for home, office or bulk supply.</p>
+      <div class="contact-points">
+        <div>Reply within one business day</div>
+        <div>No commitment required</div>
+        <div>Call us: +91 98000 00000</div>
+      </div>
+    </div>
+    <form class="quote reveal" id="quoteForm">
+      <div class="field"><label for="qn">Full name</label><input id="qn" required placeholder="Your name"></div>
+      <div class="field"><label for="qp">Phone</label><input id="qp" type="tel" required placeholder="+91"></div>
+      <div class="field full"><label for="qe">Email</label><input id="qe" type="email" required placeholder="you@example.com"></div>
+      <div class="field"><label for="qc">Company (optional)</label><input id="qc" placeholder="Company name"></div>
+      <div class="field"><label for="qt">Customer type</label>
+        <select id="qt"><option>Home</option><option>Office</option><option>Shop / Restaurant</option></select>
+      </div>
+      <div class="field full"><label for="qm">Message</label><textarea id="qm" rows="3" placeholder="Estimated quantity, delivery area, frequency..."></textarea></div>
+      <button class="btn" type="submit" id="quoteBtn">Request a quote &rarr;</button>
+      <p class="success" id="quoteOk">Thanks! We've received your request and will be in touch shortly.</p>
+      <p class="error" id="quoteErr"></p>
+    </form>
+  </div>
+</section>
+
+<!-- Contact -->
+<section class="contact" id="contact">
+  <div class="center reveal">
+    <span class="eyebrow">Contact us</span>
+    <h2>We're one <strong>message away.</strong></h2>
+    <p class="lead">Call, email or WhatsApp us. We reply within one business day.</p>
+  </div>
+  <div class="contact-grid">
+    <a class="contact-card reveal" href="tel:+919800000000">
+      <div class="dot"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"/></svg></div>
+      <h4>Call us</h4>
+      <span>+91 98000 00000</span>
+    </a>
+    <a class="contact-card reveal" href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=akashrajpurohit2008@gmail.com" target="_blank" rel="noopener">
+      <div class="dot gmail"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 6l-10 7L2 6"/></svg></div>
+      <h4>Email</h4>
+      <span>akashrajpurohit2008@gmail.com</span>
+    </a>
+    <div class="contact-card reveal">
+      <div class="dot"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg></div>
+      <h4>Address</h4>
+      <span>Your street address, city, state and PIN</span>
+    </div>
+    <a class="contact-card reveal" href="https://wa.me/919800000000" target="_blank" rel="noopener">
+      <div class="dot wa"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 11.5a8.5 8.5 0 0 1-12.6 7.4L3 20.5l1.6-5A8.5 8.5 0 1 1 21 11.5z"/></svg></div>
+      <h4>WhatsApp</h4>
+      <span>Chat with us</span>
+    </a>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta reveal">
+  <span class="eyebrow">Ready when you are</span>
+  <h2>Your next refill is <strong>one tap away.</strong></h2>
+  <button class="btn" data-open-order>Build an order &rarr;</button>
+  <p class="sub">Free delivery on your first order.</p>
+</section>
+
+<footer>
+  <span>&copy; 2026 AquaFlow. All rights reserved.</span>
+  <span>Purified drinking water, delivered.</span>
+</footer>
+
+<!-- Order modal -->
+<div class="overlay" id="orderModal" role="dialog" aria-modal="true" aria-labelledby="orderTitle">
+  <div class="modal">
+    <button class="close" data-close aria-label="Close">&times;</button>
+
+    <!-- Step 1: address -->
+    <div id="stepAddress">
+      <div class="step-label">Step 1 of 2 &middot; Your details</div>
+      <h3 id="orderTitle">Where should we deliver?</h3>
+      <form id="addressForm" class="stack">
+        <div class="grid2">
+          <div class="field"><label>Full name</label><input name="name" required></div>
+          <div class="field"><label>Phone</label><input name="phone" type="tel" required></div>
+        </div>
+        <div class="field"><label>Address line 1</label><input name="addr1" required placeholder="House / flat, street"></div>
+        <div class="field"><label>Address line 2 (optional)</label><input name="addr2" placeholder="Landmark, area"></div>
+        <div class="grid2">
+          <div class="field"><label>City</label><input name="city" required></div>
+          <div class="field"><label>PIN code</label><input name="pin" required pattern="[0-9]{6}" placeholder="6 digits"></div>
+        </div>
+        <div class="actions">
+          <button class="btn" type="submit">Next: choose products &rarr;</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Step 2: products -->
+    <div id="stepProducts" class="hidden">
+      <div class="step-label">Step 2 of 2 &middot; Your order</div>
+      <h3>Choose your supply</h3>
+      <div id="productList"></div>
+      <div class="callout">
+        <b>Custom sizes &amp; other products</b>
+        <p>Need a custom bottle size? Coffee and tea premixes, vending machines and filters are available on request.</p>
+        <div class="callout-actions">
+          <a class="btn small ghost" href="tel:+919800000000">Call us</a>
+          <a class="btn small ghost" href="https://wa.me/919800000000" target="_blank" rel="noopener">WhatsApp</a>
+        </div>
+      </div>
+      <div class="total"><span>Subtotal (excl. GST)</span><strong id="subtotal">&#8377;0</strong></div>
+      <div class="actions">
+        <button class="btn ghost" id="backBtn" type="button">Back</button>
+        <button class="btn" id="placeBtn" type="button" disabled>Place order</button>
+      </div>
+      <p class="success" id="orderOk" style="display:none;margin-top:16px;">Order placed! We'll confirm your delivery slot shortly.</p>
+      <p class="error" id="orderErr" style="margin-top:16px;"></p>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ---------- Reveal on scroll ----------
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
+  }, { threshold: 0.15 });
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+  // ---------- Order modal ----------
+  const modal = document.getElementById('orderModal');
+  const stepAddress = document.getElementById('stepAddress');
+  const stepProducts = document.getElementById('stepProducts');
+  const productList = document.getElementById('productList');
+  const subtotalEl = document.getElementById('subtotal');
+  const placeBtn = document.getElementById('placeBtn');
+  const orderOk = document.getElementById('orderOk');
+
+  const products = [
+    { id: 'b100',  name: '100 ml Bottles',  desc: 'Pack of 48 &middot; min. 25 packs', price: 600,  min: 25 },
+    { id: 'b250',  name: '250 ml Bottles',  desc: 'Pack of 48 &middot; min. 25 packs', price: 900,  min: 25 },
+    { id: 'b750',  name: '750 ml Bottles',  desc: 'Pack of 48 &middot; min. 25 packs', price: 1500, min: 25 },
+    { id: 'b1000', name: '1000 ml Bottles', desc: 'Pack of 48 &middot; min. 25 packs', price: 1800, min: 25 },
+    { id: 'jar20', name: '20 Litre Jar',    desc: 'Returnable jar',                    price: 200,  min: 1 }
+  ];
+  const MAX_QTY = 1000;
+const productImg = {
+    b100: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMDAgMjAwIj4KICA8ZGVmcz4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0iYjEwMC1nbGFzcyIgeDE9IjAiIHgyPSIxIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjYmZlM2YwIi8+CiAgICAgIDxzdG9wIG9mZnNldD0iLjQ1IiBzdG9wLWNvbG9yPSIjZjdmY2ZlIi8+CiAgICAgIDxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iI2I1ZGNlYyIvPgogICAgPC9saW5lYXJHcmFkaWVudD4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0iYjEwMC13YXRlciIgeDE9IjAiIHgyPSIxIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjN2ZkOGU2IiBzdG9wLW9wYWNpdHk9Ii41NSIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiMxZmE2YzQiIHN0b3Atb3BhY2l0eT0iLjQ1Ii8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogIDwvZGVmcz4KICA8Y2lyY2xlIGN4PSIxMDAiIGN5PSIxMDAiIHI9IjkyIiBmaWxsPSIjZTZmOGZiIi8+CiAgPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMTAwIDEwMCkgc2NhbGUoMC43OCkgdHJhbnNsYXRlKC0xMDAgLTEwMCkiPgogICAgPHJlY3QgeD0iODQiIHk9IjE2IiB3aWR0aD0iMzIiIGhlaWdodD0iMTgiIHJ4PSIzIiBmaWxsPSIjMWU2ZmQ2Ii8+CiAgICA8cmVjdCB4PSI4NCIgeT0iMTYiIHdpZHRoPSIzMiIgaGVpZ2h0PSI1IiByeD0iMiIgZmlsbD0iIzRmOTNlNiIvPgogICAgPHJlY3QgeD0iODgiIHk9IjM0IiB3aWR0aD0iMjQiIGhlaWdodD0iMTAiIGZpbGw9IiNkOWVjZjciIHN0cm9rZT0iIzlmYzllMCIgc3Ryb2tlLXdpZHRoPSIxIi8+CiAgICA8cGF0aCBkPSJNODAgNDQgTDEyMCA0NCBRMTI5IDYwIDEyOSA3OCBMMTI5IDE4MCBRMTI5IDE4NyAxMjIgMTg3IEw3OCAxODcgUTcxIDE4NyA3MSAxODAgTDcxIDc4IFE3MSA2MCA4MCA0NCBaIiBmaWxsPSJ1cmwoI2IxMDAtZ2xhc3MpIiBzdHJva2U9IiM4Y2M0ZGQiIHN0cm9rZS13aWR0aD0iMS41Ii8+CiAgICA8cGF0aCBkPSJNNzIgODAgSDEyOCBWMTgyIFExMjggMTg2IDEyNCAxODYgSDc2IFE3MiAxODYgNzIgMTgyIFoiIGZpbGw9InVybCgjYjEwMC13YXRlcikiLz4KICAgIDxyZWN0IHg9IjgwIiB5PSI2MiIgd2lkdGg9IjUiIGhlaWdodD0iMTEyIiByeD0iMi41IiBmaWxsPSIjZmZmZmZmIiBvcGFjaXR5PSIuNyIvPgogICAgPHJlY3QgeD0iNzIiIHk9Ijk4IiB3aWR0aD0iNTYiIGhlaWdodD0iNTIiIGZpbGw9IiMxZmE2YzQiLz4KICAgIDxyZWN0IHg9IjcyIiB5PSI5OCIgd2lkdGg9IjU2IiBoZWlnaHQ9IjYiIGZpbGw9IiNmZmZmZmYiIG9wYWNpdHk9Ii44NSIvPgogICAgPHJlY3QgeD0iNzIiIHk9IjE0NCIgd2lkdGg9IjU2IiBoZWlnaHQ9IjYiIGZpbGw9IiNmZmZmZmYiIG9wYWNpdHk9Ii44NSIvPgogICAgPHRleHQgeD0iMTAwIiB5PSIxMjEiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNSIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+QUY8L3RleHQ+CiAgICA8dGV4dCB4PSIxMDAiIHk9IjEzNiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjkiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPjEwMCBtbDwvdGV4dD4KICAgIDxyZWN0IHg9Ijc0IiB5PSIxODQiIHdpZHRoPSI1MiIgaGVpZ2h0PSI0IiByeD0iMiIgZmlsbD0iIzlmYzllMCIvPgogIDwvZz4KPC9zdmc+',
+    b250: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMDAgMjAwIj4KICA8ZGVmcz4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0iYjI1MC1nbGFzcyIgeDE9IjAiIHgyPSIxIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjYmZlM2YwIi8+CiAgICAgIDxzdG9wIG9mZnNldD0iLjQ1IiBzdG9wLWNvbG9yPSIjZjdmY2ZlIi8+CiAgICAgIDxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iI2I1ZGNlYyIvPgogICAgPC9saW5lYXJHcmFkaWVudD4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0iYjI1MC13YXRlciIgeDE9IjAiIHgyPSIxIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjN2ZkOGU2IiBzdG9wLW9wYWNpdHk9Ii41NSIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiMxZmE2YzQiIHN0b3Atb3BhY2l0eT0iLjQ1Ii8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogIDwvZGVmcz4KICA8Y2lyY2xlIGN4PSIxMDAiIGN5PSIxMDAiIHI9IjkyIiBmaWxsPSIjZTZmOGZiIi8+CiAgPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMTAwIDEwMCkgc2NhbGUoMC44NikgdHJhbnNsYXRlKC0xMDAgLTEwMCkiPgogICAgPHJlY3QgeD0iODQiIHk9IjE2IiB3aWR0aD0iMzIiIGhlaWdodD0iMTgiIHJ4PSIzIiBmaWxsPSIjMWU2ZmQ2Ii8+CiAgICA8cmVjdCB4PSI4NCIgeT0iMTYiIHdpZHRoPSIzMiIgaGVpZ2h0PSI1IiByeD0iMiIgZmlsbD0iIzRmOTNlNiIvPgogICAgPHJlY3QgeD0iODgiIHk9IjM0IiB3aWR0aD0iMjQiIGhlaWdodD0iMTAiIGZpbGw9IiNkOWVjZjciIHN0cm9rZT0iIzlmYzllMCIgc3Ryb2tlLXdpZHRoPSIxIi8+CiAgICA8cGF0aCBkPSJNODAgNDQgTDEyMCA0NCBRMTI5IDYwIDEyOSA3OCBMMTI5IDE4MCBRMTI5IDE4NyAxMjIgMTg3IEw3OCAxODcgUTcxIDE4NyA3MSAxODAgTDcxIDc4IFE3MSA2MCA4MCA0NCBaIiBmaWxsPSJ1cmwoI2IyNTAtZ2xhc3MpIiBzdHJva2U9IiM4Y2M0ZGQiIHN0cm9rZS13aWR0aD0iMS41Ii8+CiAgICA8cGF0aCBkPSJNNzIgODAgSDEyOCBWMTgyIFExMjggMTg2IDEyNCAxODYgSDc2IFE3MiAxODYgNzIgMTgyIFoiIGZpbGw9InVybCgjYjI1MC13YXRlcikiLz4KICAgIDxyZWN0IHg9IjgwIiB5PSI2MiIgd2lkdGg9IjUiIGhlaWdodD0iMTEyIiByeD0iMi41IiBmaWxsPSIjZmZmZmZmIiBvcGFjaXR5PSIuNyIvPgogICAgPHJlY3QgeD0iNzIiIHk9Ijk4IiB3aWR0aD0iNTYiIGhlaWdodD0iNTIiIGZpbGw9IiMxZmE2YzQiLz4KICAgIDxyZWN0IHg9IjcyIiB5PSI5OCIgd2lkdGg9IjU2IiBoZWlnaHQ9IjYiIGZpbGw9IiNmZmZmZmYiIG9wYWNpdHk9Ii44NSIvPgogICAgPHJlY3QgeD0iNzIiIHk9IjE0NCIgd2lkdGg9IjU2IiBoZWlnaHQ9IjYiIGZpbGw9IiNmZmZmZmYiIG9wYWNpdHk9Ii44NSIvPgogICAgPHRleHQgeD0iMTAwIiB5PSIxMjEiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNSIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+QUY8L3RleHQ+CiAgICA8dGV4dCB4PSIxMDAiIHk9IjEzNiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjkiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPjI1MCBtbDwvdGV4dD4KICAgIDxyZWN0IHg9Ijc0IiB5PSIxODQiIHdpZHRoPSI1MiIgaGVpZ2h0PSI0IiByeD0iMiIgZmlsbD0iIzlmYzllMCIvPgogIDwvZz4KPC9zdmc+',
+    b750: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMDAgMjAwIj4KICA8ZGVmcz4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0iYjc1MC1nbGFzcyIgeDE9IjAiIHgyPSIxIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjYmZlM2YwIi8+CiAgICAgIDxzdG9wIG9mZnNldD0iLjQ1IiBzdG9wLWNvbG9yPSIjZjdmY2ZlIi8+CiAgICAgIDxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iI2I1ZGNlYyIvPgogICAgPC9saW5lYXJHcmFkaWVudD4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0iYjc1MC13YXRlciIgeDE9IjAiIHgyPSIxIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjN2ZkOGU2IiBzdG9wLW9wYWNpdHk9Ii41NSIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiMxZmE2YzQiIHN0b3Atb3BhY2l0eT0iLjQ1Ii8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogIDwvZGVmcz4KICA8Y2lyY2xlIGN4PSIxMDAiIGN5PSIxMDAiIHI9IjkyIiBmaWxsPSIjZTZmOGZiIi8+CiAgPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMTAwIDEwMCkgc2NhbGUoMC45NCkgdHJhbnNsYXRlKC0xMDAgLTEwMCkiPgogICAgPHJlY3QgeD0iODQiIHk9IjE2IiB3aWR0aD0iMzIiIGhlaWdodD0iMTgiIHJ4PSIzIiBmaWxsPSIjMWU2ZmQ2Ii8+CiAgICA8cmVjdCB4PSI4NCIgeT0iMTYiIHdpZHRoPSIzMiIgaGVpZ2h0PSI1IiByeD0iMiIgZmlsbD0iIzRmOTNlNiIvPgogICAgPHJlY3QgeD0iODgiIHk9IjM0IiB3aWR0aD0iMjQiIGhlaWdodD0iMTAiIGZpbGw9IiNkOWVjZjciIHN0cm9rZT0iIzlmYzllMCIgc3Ryb2tlLXdpZHRoPSIxIi8+CiAgICA8cGF0aCBkPSJNODAgNDQgTDEyMCA0NCBRMTI5IDYwIDEyOSA3OCBMMTI5IDE4MCBRMTI5IDE4NyAxMjIgMTg3IEw3OCAxODcgUTcxIDE4NyA3MSAxODAgTDcxIDc4IFE3MSA2MCA4MCA0NCBaIiBmaWxsPSJ1cmwoI2I3NTAtZ2xhc3MpIiBzdHJva2U9IiM4Y2M0ZGQiIHN0cm9rZS13aWR0aD0iMS41Ii8+CiAgICA8cGF0aCBkPSJNNzIgODAgSDEyOCBWMTgyIFExMjggMTg2IDEyNCAxODYgSDc2IFE3MiAxODYgNzIgMTgyIFoiIGZpbGw9InVybCgjYjc1MC13YXRlcikiLz4KICAgIDxyZWN0IHg9IjgwIiB5PSI2MiIgd2lkdGg9IjUiIGhlaWdodD0iMTEyIiByeD0iMi41IiBmaWxsPSIjZmZmZmZmIiBvcGFjaXR5PSIuNyIvPgogICAgPHJlY3QgeD0iNzIiIHk9Ijk4IiB3aWR0aD0iNTYiIGhlaWdodD0iNTIiIGZpbGw9IiMxZmE2YzQiLz4KICAgIDxyZWN0IHg9IjcyIiB5PSI5OCIgd2lkdGg9IjU2IiBoZWlnaHQ9IjYiIGZpbGw9IiNmZmZmZmYiIG9wYWNpdHk9Ii44NSIvPgogICAgPHJlY3QgeD0iNzIiIHk9IjE0NCIgd2lkdGg9IjU2IiBoZWlnaHQ9IjYiIGZpbGw9IiNmZmZmZmYiIG9wYWNpdHk9Ii44NSIvPgogICAgPHRleHQgeD0iMTAwIiB5PSIxMjEiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNSIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+QUY8L3RleHQ+CiAgICA8dGV4dCB4PSIxMDAiIHk9IjEzNiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjkiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPjc1MCBtbDwvdGV4dD4KICAgIDxyZWN0IHg9Ijc0IiB5PSIxODQiIHdpZHRoPSI1MiIgaGVpZ2h0PSI0IiByeD0iMiIgZmlsbD0iIzlmYzllMCIvPgogIDwvZz4KPC9zdmc+',
+    b1000: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMDAgMjAwIj4KICA8ZGVmcz4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0iYjEwMDAtZ2xhc3MiIHgxPSIwIiB4Mj0iMSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iI2JmZTNmMCIvPgogICAgICA8c3RvcCBvZmZzZXQ9Ii40NSIgc3RvcC1jb2xvcj0iI2Y3ZmNmZSIvPgogICAgICA8c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiNiNWRjZWMiLz4KICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImIxMDAwLXdhdGVyIiB4MT0iMCIgeDI9IjEiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiM3ZmQ4ZTYiIHN0b3Atb3BhY2l0eT0iLjU1Ii8+CiAgICAgIDxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzFmYTZjNCIgc3RvcC1vcGFjaXR5PSIuNDUiLz4KICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgPC9kZWZzPgogIDxjaXJjbGUgY3g9IjEwMCIgY3k9IjEwMCIgcj0iOTIiIGZpbGw9IiNlNmY4ZmIiLz4KICA8ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgxMDAgMTAwKSBzY2FsZSgxLjApIHRyYW5zbGF0ZSgtMTAwIC0xMDApIj4KICAgIDxyZWN0IHg9Ijg0IiB5PSIxNiIgd2lkdGg9IjMyIiBoZWlnaHQ9IjE4IiByeD0iMyIgZmlsbD0iIzFlNmZkNiIvPgogICAgPHJlY3QgeD0iODQiIHk9IjE2IiB3aWR0aD0iMzIiIGhlaWdodD0iNSIgcng9IjIiIGZpbGw9IiM0ZjkzZTYiLz4KICAgIDxyZWN0IHg9Ijg4IiB5PSIzNCIgd2lkdGg9IjI0IiBoZWlnaHQ9IjEwIiBmaWxsPSIjZDllY2Y3IiBzdHJva2U9IiM5ZmM5ZTAiIHN0cm9rZS13aWR0aD0iMSIvPgogICAgPHBhdGggZD0iTTgwIDQ0IEwxMjAgNDQgUTEyOSA2MCAxMjkgNzggTDEyOSAxODAgUTEyOSAxODcgMTIyIDE4NyBMNzggMTg3IFE3MSAxODcgNzEgMTgwIEw3MSA3OCBRNzEgNjAgODAgNDQgWiIgZmlsbD0idXJsKCNiMTAwMC1nbGFzcykiIHN0cm9rZT0iIzhjYzRkZCIgc3Ryb2tlLXdpZHRoPSIxLjUiLz4KICAgIDxwYXRoIGQ9Ik03MiA4MCBIMTI4IFYxODIgUTEyOCAxODYgMTI0IDE4NiBINzYgUTcyIDE4NiA3MiAxODIgWiIgZmlsbD0idXJsKCNiMTAwMC13YXRlcikiLz4KICAgIDxyZWN0IHg9IjgwIiB5PSI2MiIgd2lkdGg9IjUiIGhlaWdodD0iMTEyIiByeD0iMi41IiBmaWxsPSIjZmZmZmZmIiBvcGFjaXR5PSIuNyIvPgogICAgPHJlY3QgeD0iNzIiIHk9Ijk4IiB3aWR0aD0iNTYiIGhlaWdodD0iNTIiIGZpbGw9IiMxZmE2YzQiLz4KICAgIDxyZWN0IHg9IjcyIiB5PSI5OCIgd2lkdGg9IjU2IiBoZWlnaHQ9IjYiIGZpbGw9IiNmZmZmZmYiIG9wYWNpdHk9Ii44NSIvPgogICAgPHJlY3QgeD0iNzIiIHk9IjE0NCIgd2lkdGg9IjU2IiBoZWlnaHQ9IjYiIGZpbGw9IiNmZmZmZmYiIG9wYWNpdHk9Ii44NSIvPgogICAgPHRleHQgeD0iMTAwIiB5PSIxMjEiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNSIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiI+QUY8L3RleHQ+CiAgICA8dGV4dCB4PSIxMDAiIHk9IjEzNiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjkiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiNmZmZmZmYiPjEgTDwvdGV4dD4KICAgIDxyZWN0IHg9Ijc0IiB5PSIxODQiIHdpZHRoPSI1MiIgaGVpZ2h0PSI0IiByeD0iMiIgZmlsbD0iIzlmYzllMCIvPgogIDwvZz4KPC9zdmc+',
+    jar20: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMDAgMjAwIiB4bWxuczpjMnBhPSJodHRwOi8vYzJwYS5vcmcvbWFuaWZlc3QiPjxtZXRhZGF0YT48YzJwYTptYW5pZmVzdD5BQUFXZ21wMWJXSUFBQUFlYW5WdFpHTXljR0VBRVFBUWdBQUFxZ0E0bTNFRFl6SndZUUFBQUJaY2FuVnRZZ0FBQUVkcWRXMWtZekp0WVFBUkFCQ0FBQUNxQURpYmNRTjFjbTQ2WXpKd1lUcGhabVprWVdabE15MDFPVEV3TFRRMFlUa3RPRFF6TlMweE4yRTJNRFZpTnpJNFpESUFBQUFEbDJwMWJXSUFBQUFwYW5WdFpHTXlZWE1BRVFBUWdBQUFxZ0E0bTNFRFl6SndZUzVoYzNObGNuUnBiMjV6QUFBQUFMeHFkVzFpQUFBQVJHcDFiV1JqWW05eUFCRUFFSUFBQUtvQU9KdHhFMk15Y0dFdWFXNW5jbVZrYVdWdWRDNTJNd0FBQUFBWVl6SnphQkVZQlI2aFBUQTZ5dkVkRlJZV1FKY0FBQUJ3WTJKdmNxTnBaR002Wm05eWJXRjBiV2x0WVdkbEwzTjJaeXQ0Yld4cWFXNXpkR0Z1WTJWSlJIZ3NlRzF3T21scFpEbzJORGMzWVRjMll5MHdOREJqTFRRelpqQXRPRFExTnkxaE4yTmhZemRqTkRRMU1EQnNjbVZzWVhScGIyNXphR2x3YUhCaGNtVnVkRTltQUFBQjRtcDFiV0lBQUFCQmFuVnRaR05pYjNJQUVRQVFnQUFBcWdBNG0zRVRZekp3WVM1aFkzUnBiMjV6TG5ZeUFBQUFBQmhqTW5Ob2doY3E3ckUwOWhZNzZFWis5K2o0Q3dBQUFabGpZbTl5b21kaFkzUnBiMjV6Z3FKbVlXTjBhVzl1YTJNeWNHRXViM0JsYm1Wa2FuQmhjbUZ0WlhSbGNuT2hhMmx1WjNKbFpHbGxiblJ6Z2FKamRYSnNlQzF6Wld4bUkycDFiV0ptUFdNeWNHRXVZWE56WlhKMGFXOXVjeTlqTW5CaExtbHVaM0psWkdsbGJuUXVkak5rYUdGemFGZ2c4K0hvdVYyU1R2QTV3Q2FQK1pKV1FyZmFVM0g2bFhUMzVhY2lKYWwrT3Zla1ptRmpkR2x2Ym5nZFkyOXRMbUZ1ZEdoeWIzQnBZeTVqYkdGMVpHVXVjSEp2ZG1sa1pXUnFjR0Z5WVcxbGRHVnljNkY0SDJOdmJTNWhiblJvY205d2FXTXViM0pwWjJsdUxXTnZibVpwWkdWdVkyVm5kVzVyYm05M2JtdGtaWE5qY21sd2RHbHZibmhtUTJ4aGRXUmxJSEJ5YjNacFpHVmtJSFJvYVhNZ1ptbHNaU0JoZENCMGFHVWdjbVZ4ZFdWemRDQnZaaUJoSUhWelpYSWdZVzVrSUcxaGVTQm9ZWFpsSUdOeVpXRjBaV1FnYjNJZ2JXOWthV1pwWldRZ2RHaGxJR1pwYkdVZ1kyOXVkR1Z1ZEhNdWJYTnZablIzWVhKbFFXZGxiblNoWkc1aGJXVm1RMnhoZFdSbGNtRnNiRUZqZEdsdmJuTkpibU5zZFdSbFpQVUFBQURJYW5WdFlnQUFBRUJxZFcxa1kySnZjZ0FSQUJDQUFBQ3FBRGliY1JOak1uQmhMbWhoYzJndVpHRjBZUUFBQUFBWVl6SnphUEp4T3hPODgrL2lRTDUybllCOENLTUFBQUNBWTJKdmNxVmpZV3huWm5Ob1lUSTFObU53WVdSTkFBQUFBQUFBQUFBQUFBQUFBR1JvWVhOb1dDRGVUQTdIeFdVaUo3OGhzcWxINWNkR1AyeHk5cldPOWJQRUVweER0ZWkvYldSdVlXMWxibXAxYldKbUlHMWhibWxtWlhOMGFtVjRZMngxYzJsdmJuT0JvbVZ6ZEdGeWRCaDlabXhsYm1kMGFCa2VCQUFBQWo1cWRXMWlBQUFBSjJwMWJXUmpNbU5zQUJFQUVJQUFBS29BT0p0eEEyTXljR0V1WTJ4aGFXMHVkaklBQUFBQ0QyTmliM0tsWTJGc1oyWnphR0V5TlRacGMybG5ibUYwZFhKbGVFMXpaV3htSTJwMWJXSm1QUzlqTW5CaEwzVnlianBqTW5CaE9tRm1abVJoWm1VekxUVTVNVEF0TkRSaE9TMDRORE0xTFRFM1lUWXdOV0kzTWpoa01pOWpNbkJoTG5OcFoyNWhkSFZ5WldwcGJuTjBZVzVqWlVsRWVDeDRiWEE2YVdsa09tTmpNV001T0RrekxXTTBObUl0TkdZd05TMDVOelZpTFRreVkyWm1PV0U0TkRRek5YSmpjbVZoZEdWa1gyRnpjMlZ5ZEdsdmJuT0RvbU4xY214NExYTmxiR1lqYW5WdFltWTlZekp3WVM1aGMzTmxjblJwYjI1ekwyTXljR0V1YVc1bmNtVmthV1Z1ZEM1Mk0yUm9ZWE5vV0NEejRlaTVYWkpPOERuQUpvLzVrbFpDdDlwVGNmcVZkUGZscHlJbHFYNDY5NkpqZFhKc2VDcHpaV3htSTJwMWJXSm1QV015Y0dFdVlYTnpaWEowYVc5dWN5OWpNbkJoTG1GamRHbHZibk11ZGpKa2FHRnphRmdnU2Jud2l6THU0Uk1OUkpwYnl4RjlSN3AzY0ZYekR6amVDWUlzQmVtY0p3ZWlZM1Z5YkhncGMyVnNaaU5xZFcxaVpqMWpNbkJoTG1GemMyVnlkR2x2Ym5Ndll6SndZUzVvWVhOb0xtUmhkR0ZrYUdGemFGZ2doVVptbTNKZGVnd2M1Rld3ZXZHVlVsK1BWVmRaTHFBck9pbkhkZk9GUkVoMFkyeGhhVzFmWjJWdVpYSmhkRzl5WDJsdVptK2paRzVoYldWdlFXNTBhSEp2Y0dsaklFWnBiR1Z6WjNabGNuTnBiMjVsTVM0d0xqQnJjM0JsWTFabGNuTnBiMjVsTWk0MExqQUFBQkE0YW5WdFlnQUFBQ2hxZFcxa1l6Smpjd0FSQUJDQUFBQ3FBRGliY1FOak1uQmhMbk5wWjI1aGRIVnlaUUFBQUJBSVkySnZjdEtFV1FJU29nRW1HQ0ZaQWdvd2dnSUdNSUlCamFBREFnRUNBaFJBNWFBSzdzSTUwTDY0Zy9vR1FnVTlaMVVUQURBS0JnZ3Foa2pPUFFRREF6QkpNUmN3RlFZRFZRUUtFdzVCYm5Sb2NtOXdhV01zSUZCQ1F6RXVNQ3dHQTFVRUF4TWxRVzUwYUhKdmNHbGpJRU52Ym5SbGJuUWdRM0psWkdWdWRHbGhiSE1nVW05dmRDQkRRVEFlRncweU5qQTRNRGN4T0RRek5UWmFGdzB5T0RBNE1EWXhPVFF6TlRaYU1FUXhGekFWQmdOVkJBb1REa0Z1ZEdoeWIzQnBZeXdnVUVKRE1Ta3dKd1lEVlFRREV5QkJiblJvY205d2FXTWdRMnhoZFdSbElFTnZiblJsYm5RZ1UybG5ibWx1WnpCWk1CTUdCeXFHU000OUFnRUdDQ3FHU000OUF3RUhBMElBQkpoNkNtdkxVQmdGRk5VMHZVS2xPVnRFNmRqZDE3TDVTdXdYMExlbUZpc0JNM2RrZC8zY3lqeEZBM1FvNVM0NmZYMC9paFkwVlo3bWZiOUtGNzAzdDVPaldEQldNQTRHQTFVZER3RUIvd1FFQXdJSGdEQVZCZ05WSFNVRURqQU1CZ29yQmdFRUFZUG9YZ0lCTUF3R0ExVWRFd0VCL3dRQ01BQXdId1lEVlIwakJCZ3dGb0FVemxIaUJJRk9aRnNqK09QRXo1bytuTUhYWE1Jd0NnWUlLb1pJemowRUF3TURad0F3WkFJd01YTWRGSjRCZXRMTFZZN09SdUU5bm9xYmJBWk9abi9hQXJYeVR3RkFaZktyUHp4RjJ2UG9KTmYxK1VDZGcxWEdBakJ3WDF6ZDlXR3FZa3FtTDVTRnF3MVF5U2pyMXpKZnBKTTkrMXJkRHdTUExNT1BPakt1aVhqb1UvcFVVZUc5UndtaFkzQmhaRmtObmdBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFQWllRSTBtekMraVlUSW9oMFY4d3plYkVoSi9KL0QrZ1BqSm1Id1VUZmhBLzl6TXZuK1c5KzM2Tzg1VStsaDJwNHZhTlVBeFBnQ0xCaFJaY0huUkphTUVMRFU9PC9jMnBhOm1hbmlmZXN0PjwvbWV0YWRhdGE+CiAgPGNpcmNsZSBjeD0iMTAwIiBjeT0iMTAwIiByPSI5MiIgZmlsbD0iI2U2ZjhmYiIvPgogIDxyZWN0IHg9IjgwIiB5PSIyMCIgd2lkdGg9IjQwIiBoZWlnaHQ9IjE2IiByeD0iMyIgZmlsbD0iIzEzODQ5ZSIvPgogIDxyZWN0IHg9Ijg0IiB5PSIzNiIgd2lkdGg9IjMyIiBoZWlnaHQ9IjEyIiBmaWxsPSIjYmZlYWYzIiBzdHJva2U9IiMxZmE2YzQiIHN0cm9rZS13aWR0aD0iMiIvPgogIDxyZWN0IHg9IjUwIiB5PSI0OCIgd2lkdGg9IjEwMCIgaGVpZ2h0PSIxMzciIHJ4PSIzMCIgZmlsbD0iI2RmZjVmYSIgc3Ryb2tlPSIjMWZhNmM0IiBzdHJva2Utd2lkdGg9IjIiLz4KICA8cmVjdCB4PSI1MiIgeT0iOTAiIHdpZHRoPSI5NiIgaGVpZ2h0PSI5MyIgcng9IjI2IiBmaWxsPSIjN2ZkOGU2IiBvcGFjaXR5PSIuODUiLz4KICA8cmVjdCB4PSI2MiIgeT0iMTE4IiB3aWR0aD0iNzYiIGhlaWdodD0iNDAiIHJ4PSI0IiBmaWxsPSIjZmZmZmZmIi8+CiAgPHRleHQgeD0iMTAwIiB5PSIxNDQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIyMCIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iIzEzODQ5ZSI+MjAgTDwvdGV4dD4KPC9zdmc+'
+  };
+  const qty = Object.fromEntries(products.map(p => [p.id, 0]));
+
+  function renderProducts() {
+    productList.innerHTML = products.map(p => `
+      <div class="product">
+        <img class="thumb" src="${productImg[p.id]}" alt="">
+        <div class="info"><b>${p.name}</b><span>${p.desc} &middot; &#8377;${p.price}</span></div>
+        <div class="right">
+          <div class="qty">
+            <button type="button" data-dec="${p.id}" aria-label="Decrease">&minus;</button>
+            <output id="q-${p.id}">${qty[p.id]}</output>
+            <button type="button" data-inc="${p.id}" aria-label="Increase">+</button>
+          </div>
+        </div>
+      </div>`).join('');
+    updateTotal();
+  }
+
+  function updateTotal() {
+    const total = products.reduce((sum, p) => sum + p.price * qty[p.id], 0);
+    subtotalEl.innerHTML = '&#8377;' + total;
+    placeBtn.disabled = total === 0;
+  }
+
+  // Products with a minimum jump straight to the minimum (0 -> 25 -> 26 ...)
+  productList.addEventListener('click', (e) => {
+    const inc = e.target.dataset.inc, dec = e.target.dataset.dec;
+    if (!inc && !dec) return;
+    const id = inc || dec;
+    const p = products.find(x => x.id === id);
+    if (inc) qty[id] = qty[id] === 0 ? p.min : Math.min(MAX_QTY, qty[id] + 1);
+    if (dec) qty[id] = qty[id] <= p.min ? 0 : qty[id] - 1;
+    document.getElementById('q-' + id).textContent = qty[id];
+    updateTotal();
+  });
+
+  function openModal() {
+    modal.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    stepAddress.classList.remove('hidden');
+    stepProducts.classList.add('hidden');
+    orderOk.style.display = 'none';
+  }
+  function closeModal() {
+    modal.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  document.querySelectorAll('[data-open-order]').forEach(b => b.addEventListener('click', openModal));
+  document.querySelector('[data-close]').addEventListener('click', closeModal);
+  modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { closeModal(); setLogin(false); } });
+
+  let deliveryAddress = {};
+  async function secureApiJson(url, payload) {
+    const csrfResponse = await fetch('/api/csrf', { credentials: 'same-origin' });
+    const csrf = await csrfResponse.json();
+    const response = await fetch(url, {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrf.token },
+      body: JSON.stringify(payload)
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.fields ? Object.values(data.fields).join(' ') : data.error);
+    return data;
+  }
+  document.getElementById('addressForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    deliveryAddress = Object.fromEntries(new FormData(e.target).entries());
+    placeBtn.textContent = 'Place order';
+    renderProducts();
+    stepAddress.classList.add('hidden');
+    stepProducts.classList.remove('hidden');
+  });
+
+  document.getElementById('backBtn').addEventListener('click', () => {
+    stepProducts.classList.add('hidden');
+    stepAddress.classList.remove('hidden');
+  });
+
+  placeBtn.addEventListener('click', async () => {
+    const orderErr = document.getElementById('orderErr');
+    orderErr.style.display = 'none';
+    placeBtn.disabled = true;
+    placeBtn.textContent = 'Placing order...';
+
+    const items = Object.entries(qty)
+      .filter(([, n]) => n > 0)
+      .map(([id, n]) => ({ id, qty: n }));
+
+    try {
+      const data = await secureApiJson('/api/orders', { ...deliveryAddress, items });
+      orderOk.textContent = data.message;
+      orderOk.style.display = 'block';
+      placeBtn.textContent = 'Order placed';
+      Object.keys(qty).forEach(k => qty[k] = 0);
+    } catch (err) {
+      orderErr.textContent = err.message === 'Failed to fetch'
+        ? 'Network error. Please check your connection and try again.'
+        : err.message;
+      orderErr.style.display = 'block';
+      placeBtn.disabled = false;
+      placeBtn.textContent = 'Place order';
+    }
+  });
+
+  // ---------- Quote form ----------
+  document.getElementById('quoteForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const form = e.target;
+    const btn = document.getElementById('quoteBtn');
+    const ok = document.getElementById('quoteOk');
+    const err = document.getElementById('quoteErr');
+    ok.style.display = 'none';
+    err.style.display = 'none';
+    btn.disabled = true;
+    btn.textContent = 'Sending...';
+
+    const payload = {
+      name: document.getElementById('qn').value,
+      phone: document.getElementById('qp').value,
+      email: document.getElementById('qe').value,
+      company: document.getElementById('qc').value,
+      customer_type: document.getElementById('qt').value,
+      message: document.getElementById('qm').value
+    };
+
+    try {
+      const data = await secureApiJson('/api/quote', payload);
+      ok.textContent = data.message;
+      ok.style.display = 'block';
+      form.reset();
+    } catch (error) {
+      err.textContent = error.message === 'Failed to fetch'
+        ? 'Network error. Please check your connection and try again.'
+        : error.message;
+      err.style.display = 'block';
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Request a quote \u2192';
+    }
+  });
+  if (false) {
+  // ---------- Login panel ----------
+  // TEMPORARY frontend login. Replace with Flask authentication before launch.
+  const TEST_LOGIN_ID = null;
+  const TEST_LOGIN_PASSWORD = null;
+  const STAFF_USERS = Object.freeze({});
+  const DASHBOARD_URLS = {
+    client: 'client-dashboard.html',
+    staff: 'staff-dashboard.html',
+    driver: 'driver-dashboard.html'
+  };
+
+  const loginToggle = document.getElementById('loginToggle');
+  const loginPanel = document.getElementById('loginPanel');
+  const roleChoice = document.getElementById('roleChoice');
+  const loginForm = document.getElementById('loginForm');
+  const loginMsg = document.getElementById('loginMsg');
+  const signedIn = document.getElementById('signedIn');
+  const roleNames = { client: 'Client', staff: 'Staff', driver: 'Driver' };
+  let loginRole = null;      // role chosen in the panel
+  let signedInRole = null;   // role currently logged in
+
+  function setLogin(open) {
+    loginPanel.classList.toggle('open', open);
+    loginPanel.setAttribute('aria-hidden', String(!open));
+    loginToggle.setAttribute('aria-expanded', String(open));
+    if (!open) resetLogin();
+  }
+
+  function renderLoginState() {
+    if (signedInRole) {
+      roleChoice.classList.add('hidden');
+      loginForm.classList.add('hidden');
+      signedIn.classList.remove('hidden');
+      document.getElementById('signedInText').textContent = 'Signed in as ' + roleNames[signedInRole];
+      loginToggle.textContent = roleNames[signedInRole];
+    } else {
+      signedIn.classList.add('hidden');
+      loginForm.classList.add('hidden');
+      roleChoice.classList.remove('hidden');
+      loginToggle.textContent = 'Login';
+    }
+  }
+
+  function resetLogin() {
+    loginForm.reset();
+    loginMsg.textContent = '';
+    renderLoginState();
+  }
+
+  loginToggle.addEventListener('click', () => setLogin(!loginPanel.classList.contains('open')));
+
+  document.querySelectorAll('.login-role').forEach(btn => btn.addEventListener('click', () => {
+    loginRole = btn.dataset.role;
+    document.getElementById('loginTitle').textContent = roleNames[loginRole] + ' login';
+    roleChoice.classList.add('hidden');
+    loginForm.classList.remove('hidden');
+    loginMsg.textContent = '';
+  }));
+
+  document.getElementById('loginBack').addEventListener('click', resetLogin);
+
+  loginForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const id = document.getElementById('lu').value.trim();
+    const pw = document.getElementById('lp').value;
+    const staffUser = loginRole === 'staff' ? STAFF_USERS[id.toLowerCase()] : null;
+    const validLogin = loginRole === 'staff'
+      ? Boolean(staffUser && staffUser.password === pw)
+      : id === TEST_LOGIN_ID && pw === TEST_LOGIN_PASSWORD;
+
+    if (validLogin) {
+      signedInRole = loginRole;
+      sessionStorage.setItem('aquaFlowRole', loginRole);
+      if (staffUser) sessionStorage.setItem('aquaFlowStaff', JSON.stringify({ id: id.toLowerCase(), name: staffUser.name }));
+      loginForm.reset();
+      const destination = loginRole === 'staff'
+        ? `${DASHBOARD_URLS.staff}?staff=${encodeURIComponent(id.toLowerCase())}`
+        : DASHBOARD_URLS[loginRole];
+      window.location.href = destination;
+      return;
+      renderLoginState();
+    } else {
+      loginMsg.textContent = 'Wrong email or password.';
+    }
+  });
+
+  document.getElementById('logoutBtn').addEventListener('click', () => {
+    signedInRole = null;
+    loginRole = null;
+    resetLogin();
+  });
+
+  // Close the panel when clicking anywhere outside the top bar
+  document.addEventListener('click', (e) => {
+    if (loginPanel.classList.contains('open') && !e.target.closest('header')) setLogin(false);
+  });
+  }
+</script>
+<script>
+  // Temporary frontend role login. Replace with Flask authentication before launch.
+  const roleNames = { client:'Client', staff:'Staff', driver:'Driver' };
+  const loginToggle = document.getElementById('loginToggle');
+  const loginPanel = document.getElementById('loginPanel');
+  const roleChoice = document.getElementById('roleChoice');
+  const loginForm = document.getElementById('loginForm');
+  const loginMsg = document.getElementById('loginMsg');
+  let selectedRole = null;
+  function closeLogin(){ loginPanel.classList.remove('open'); loginPanel.setAttribute('aria-hidden','true'); loginToggle.setAttribute('aria-expanded','false'); roleChoice.classList.remove('hidden'); loginForm.classList.add('hidden'); registerForm.classList.add('hidden'); loginMsg.textContent=''; registerMsg.textContent=''; loginForm.reset(); registerForm.reset(); }
+  loginToggle.addEventListener('click',()=>{const open=!loginPanel.classList.contains('open');loginPanel.classList.toggle('open',open);loginPanel.setAttribute('aria-hidden',String(!open));loginToggle.setAttribute('aria-expanded',String(open));});
+  document.querySelectorAll('.login-role').forEach(button=>button.addEventListener('click',()=>{selectedRole=button.dataset.role;document.getElementById('loginTitle').textContent=roleNames[selectedRole]+' login';roleChoice.classList.add('hidden');loginForm.classList.remove('hidden');loginMsg.textContent='';document.getElementById('loginId').focus();}));
+  document.getElementById('loginBack').addEventListener('click',closeLogin);
+  async function apiJson(url, options={}){const csrf=await fetch('/api/csrf',{credentials:'same-origin'}).then(r=>r.json());const response=await fetch(url,{...options,credentials:'same-origin',headers:{'Content-Type':'application/json','X-CSRF-Token':csrf.token,...(options.headers||{})}});const data=await response.json().catch(()=>({}));if(!response.ok)throw new Error(data.error||'Request failed.');return data;}
+  loginForm.addEventListener('submit',async event=>{event.preventDefault();const id=document.getElementById('loginId').value.trim().toLowerCase();const password=document.getElementById('loginPassword').value;loginMsg.textContent='Signing in...';try{const data=await apiJson('/api/login',{method:'POST',body:JSON.stringify({username:id,password})});if(data.role!==selectedRole)throw new Error('This account does not belong to the selected role.');const destination={client:'client-dashboard.html',staff:'staff-dashboard.html',driver:'driver-dashboard.html'}[data.role];window.location.href=destination;}catch(error){loginMsg.textContent=error.message;}});
+  document.addEventListener('click',event=>{if(loginPanel.classList.contains('open')&&!event.target.closest('header'))closeLogin();});
+  const registerOpen = document.getElementById('registerOpen');
+  const registerTop = document.getElementById('registerTop');
+  const registerForm = document.getElementById('registerForm');
+  const registerMsg = document.getElementById('registerMsg');
+  function openRegistration(){loginPanel.classList.add('open');loginPanel.setAttribute('aria-hidden','false');loginToggle.setAttribute('aria-expanded','true');roleChoice.classList.add('hidden');loginForm.classList.add('hidden');registerForm.classList.remove('hidden');registerMsg.textContent='';document.getElementById('registerName').focus();}
+  registerOpen.addEventListener('click',openRegistration);
+  registerTop.addEventListener('click',openRegistration);
+  document.getElementById('registerBack').addEventListener('click',()=>{registerForm.classList.add('hidden');roleChoice.classList.remove('hidden');registerForm.reset();registerMsg.textContent='';});
+  registerForm.addEventListener('submit',async event=>{event.preventDefault();const name=document.getElementById('registerName').value.trim();const phone=document.getElementById('registerPhone').value.trim();const email=document.getElementById('registerEmail').value.trim().toLowerCase();const password=document.getElementById('registerPassword').value;const confirm=document.getElementById('registerConfirm').value;if(password!==confirm){registerMsg.textContent='Passwords do not match.';return;}registerMsg.textContent='Creating account...';try{await apiJson('/api/register',{method:'POST',body:JSON.stringify({name,phone,email,password})});window.location.href='client-dashboard.html';}catch(error){registerMsg.textContent=error.message;}});
+</script>
+</body>
+</html>
